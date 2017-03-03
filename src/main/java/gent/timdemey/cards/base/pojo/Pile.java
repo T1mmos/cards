@@ -3,7 +3,6 @@ package gent.timdemey.cards.base.pojo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class Pile {
 
@@ -65,6 +64,6 @@ public final class Pile {
 
     @Override
     public final String toString() {
-        return cards.stream().map(card -> card.toString()).collect(Collectors.joining("][", "[", "]"));
+        return PojoUtils.pretty(this);
     }
 }

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.MoreObjects;
-
 /**
  * Keeps track of all piles.
  *
@@ -31,7 +29,6 @@ public final class PileConfig {
     
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper("")
-                .add("piles", piles).toString();
+        return PojoUtils.pretty(this);
     }
 }

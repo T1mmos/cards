@@ -7,10 +7,15 @@ import gent.timdemey.cards.base.pojo.Player;
 import gent.timdemey.cards.base.pojo.State;
 
 public class PileChangeCommand implements Command {
+    
     private final PileChange change;
 
     public PileChangeCommand(PileChange change) {        
         this.change = change;
+    }
+    
+    public PileChange getChange (){
+        return change;
     }
 
     @Override

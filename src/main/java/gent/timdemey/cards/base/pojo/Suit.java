@@ -6,10 +6,10 @@ public enum Suit {
 
     //@formatter:off
     
-    @SerializedName ("♥") HEARTS   ,
-    @SerializedName ("♣") CLUBS   ,
-    @SerializedName ("♦") DIAMONDS ,
-    @SerializedName ("♠") SPADES  ;
+    @SerializedName ("♥") HEARTS,
+    @SerializedName ("♣") CLUBS,
+    @SerializedName ("♦") DIAMONDS,
+    @SerializedName ("♠") SPADES;
     
     //@formatter:on
 }

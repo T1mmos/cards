@@ -1,8 +1,6 @@
 package gent.timdemey.cards.base.pojo;
 
 public class Player {
-
-    //@formatter:off
     
     private final String id;
     private final String name;
@@ -30,6 +28,4 @@ public class Player {
     public String toString() {
         return PojoUtils.pretty(this);
     }
-    
-    //@formatter:on
 }

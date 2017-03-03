@@ -20,5 +20,5 @@ public enum Kind {
     @SerializedName("Q")  QUEEN,
     @SerializedName("K")  KING;
     
-    //@formatter:o
+    //@formatter:on
 }

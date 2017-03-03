@@ -6,8 +6,8 @@ import java.util.List;
 
 public class Card {
 
-    private final Suit suit;
     private final Kind kind;
+    private final Suit suit;
     private boolean visible;
 
     public Card(Suit suit, Kind kind) {
@@ -49,6 +49,6 @@ public class Card {
     
     @Override
     public String toString() {
-        return "" + getKind() + getSuit();
+        return PojoUtils.pretty(this);
     }
 }
