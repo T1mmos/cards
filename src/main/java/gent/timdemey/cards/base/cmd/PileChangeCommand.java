@@ -1,10 +1,10 @@
 package gent.timdemey.cards.base.cmd;
 
-import gent.timdemey.cards.base.entities.Pile;
-import gent.timdemey.cards.base.entities.PileChange;
-import gent.timdemey.cards.base.entities.Player;
-import gent.timdemey.cards.base.entities.State;
 import gent.timdemey.cards.base.logic.Rules;
+import gent.timdemey.cards.base.pojo.Pile;
+import gent.timdemey.cards.base.pojo.PileChange;
+import gent.timdemey.cards.base.pojo.Player;
+import gent.timdemey.cards.base.pojo.State;
 
 public class PileChangeCommand implements Command {
     private final PileChange change;

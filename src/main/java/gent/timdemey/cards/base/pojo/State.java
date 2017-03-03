@@ -1,4 +1,4 @@
-package gent.timdemey.cards.base.entities;
+package gent.timdemey.cards.base.pojo;
 
 import java.util.List;
 import java.util.stream.Collectors;

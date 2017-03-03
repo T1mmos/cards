@@ -1,4 +1,4 @@
-package gent.timdemey.cards.base.entities;
+package gent.timdemey.cards.base.pojo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,16 +7,13 @@ import java.util.stream.Collectors;
 
 public final class Pile {
 
-    private final String name;
     protected final List<Card> cards;
 
-    public Pile(String name) {
-        this.name = name;
+    public Pile() {
         this.cards = new ArrayList<>();
     }
 
-    public Pile(String name, List<Card> cards) {
-        this.name = name;
+    public Pile(List<Card> cards) {
         this.cards = cards;
     }
 
@@ -53,7 +50,7 @@ public final class Pile {
         for (int i = size() - 1; i >= idx; i--) {
             excl[i - idx] = cards.remove(i);
         }
-        return new Pile("temp pile (removed from " + this.name + ")", Arrays.asList(excl));
+        return new Pile(Arrays.asList(excl));
     }
 
     /**
@@ -68,6 +65,6 @@ public final class Pile {
 
     @Override
     public final String toString() {
-        return name + cards.stream().map(card -> card.toString()).collect(Collectors.joining("[", "=[", "]="));
+        return cards.stream().map(card -> card.toString()).collect(Collectors.joining("][", "[", "]"));
     }
 }

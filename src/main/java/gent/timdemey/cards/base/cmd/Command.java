@@ -1,7 +1,7 @@
 package gent.timdemey.cards.base.cmd;
 
-import gent.timdemey.cards.base.entities.State;
 import gent.timdemey.cards.base.logic.Rules;
+import gent.timdemey.cards.base.pojo.State;
 
 /**
  * A command is a thing that unconditionally executes a specific step, and

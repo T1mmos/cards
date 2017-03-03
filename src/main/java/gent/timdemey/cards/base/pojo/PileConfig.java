@@ -1,9 +1,11 @@
-package gent.timdemey.cards.base.entities;
+package gent.timdemey.cards.base.pojo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * Keeps track of all piles.
@@ -25,5 +27,11 @@ public final class PileConfig {
 
     public Pile getPile(String sort, int idx) {
         return piles.get(sort).get(idx);        
+    }
+    
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper("")
+                .add("piles", piles).toString();
     }
 }

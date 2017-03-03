@@ -1,4 +1,4 @@
-package gent.timdemey.cards.base.entities;
+package gent.timdemey.cards.base.pojo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,7 +8,6 @@ public class Card {
 
     private final Suit suit;
     private final Kind kind;
-    
     private boolean visible;
 
     public Card(Suit suit, Kind kind) {
