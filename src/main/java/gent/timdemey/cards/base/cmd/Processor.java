@@ -1,4 +1,7 @@
-package gent.timdemey.cards.logic;
+package gent.timdemey.cards.base.cmd;
+
+import gent.timdemey.cards.base.entities.State;
+import gent.timdemey.cards.base.logic.Rules;
 
 public final class Processor {
     
@@ -12,7 +15,4 @@ public final class Processor {
         this.history = new History();
     }
     
-    public void execute (Command comm){
-        
-    }
 }

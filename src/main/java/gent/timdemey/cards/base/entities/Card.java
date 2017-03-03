@@ -1,4 +1,8 @@
-package gent.timdemey.cards.logic;
+package gent.timdemey.cards.base.entities;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Card {
 
@@ -27,6 +31,21 @@ public class Card {
     
     public boolean isVisible (){
         return visible;
+    }
+
+    /**
+     * Creates an list of the 52 standard cards, in random order.
+     * @return
+     */
+    public static List<Card> newShuffledDeck () {
+        List<Card> cards = new ArrayList<>();
+        for (Suit suit : Suit.values()){
+            for (Kind kind : Kind.values()){
+                cards.add(new Card (suit, kind));                
+            }
+        }
+        Collections.shuffle(cards);
+        return cards;
     }
     
     @Override

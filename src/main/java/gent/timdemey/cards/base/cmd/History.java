@@ -1,4 +1,4 @@
-package gent.timdemey.cards.logic;
+package gent.timdemey.cards.base.cmd;
 
 import java.util.ArrayList;
 import java.util.List;
