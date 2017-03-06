@@ -7,7 +7,6 @@ public class State {
 
     private final List<Player> players;
     private final Player ghost;
-
     private final int localIDX;
 
     public State(List<Player> players, Player ghost, int localIDX) {
@@ -22,6 +21,10 @@ public class State {
 
     public Player getLocalPlayer() {
         return players.get(localIDX);
+    }
+    
+    public Pile getPile(PileDef def){
+        return getPlayer(def.playerId).getPileConfig().getPile(def.sort, def.pileIdx);
     }
 
     /**

@@ -9,6 +9,7 @@ import gent.timdemey.cards.base.pojo.State;
  * 
  */
 public interface Command {
+    
     public void execute(State state);
 
     public void rollback(State state);

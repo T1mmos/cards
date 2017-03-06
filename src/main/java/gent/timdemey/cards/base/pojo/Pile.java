@@ -16,6 +16,10 @@ public final class Pile {
         this.cards = cards;
     }
 
+    public boolean isEmpty (){
+        return size() == 0;
+    }
+    
     public int size() {
         return cards.size();
     }
@@ -28,12 +32,22 @@ public final class Pile {
         cards.add(card);
     }
 
-    public Card peek(int idx) {
+    public Card peekCardAt(int idx) {
         return cards.get(idx);
     }
 
-    public final Card peekTop() {
-        return peek(size() - 1);
+    public final Card peekCard () {
+        return peekCardAt (size() - 1);
+    }
+    
+    public final Pile peekPileAt (int idx){
+        Pile pile = new Pile();
+        cards.subList(idx, size()).stream().forEach(pile::add);
+        return pile;
+    }
+    
+    public final Pile peekPile (int count){
+        return peekPileAt(size() - count);
     }
 
     /**
@@ -50,6 +64,19 @@ public final class Pile {
             excl[i - idx] = cards.remove(i);
         }
         return new Pile(Arrays.asList(excl));
+    }
+    
+    public boolean isVisible (int count){
+        return isVisibleAt(size() - count);
+    }
+    
+    public boolean isVisibleAt (int index){
+        for (int i = index; i < size(); i++){
+            if (!peekCardAt(i).isVisible()){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
