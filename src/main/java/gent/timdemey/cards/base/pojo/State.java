@@ -7,12 +7,12 @@ public class State {
 
     private final List<Player> players;
     private final Player ghost;
-    private final int localIDX;
+    private final String localId;
 
-    public State(List<Player> players, Player ghost, int localIDX) {
+    public State(List<Player> players, Player ghost, String localId) {
         this.players = players;
         this.ghost = ghost;
-        this.localIDX = localIDX;
+        this.localId = localId;
     }
 
     public Player getPlayer(String id) {
@@ -20,7 +20,7 @@ public class State {
     }
 
     public Player getLocalPlayer() {
-        return players.get(localIDX);
+        return getPlayer(localId);
     }
     
     public Pile getPile(PileDef def){
@@ -38,5 +38,10 @@ public class State {
      */
     public Player getGhostPlayer() {
         return ghost;
+    }
+    
+    @Override
+    public String toString() {
+        return PojoUtils.pretty(this);
     }
 }

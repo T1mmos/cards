@@ -35,4 +35,9 @@ public class PutDownCommand implements Command {
         return rules.isAllowed(state, def);
     }
 
+    @Override
+    public String toString() {
+        return "PUT DOWN " + def.howmany + " from TEMP on (" + def.to.playerId + ";" + def.to.sort + ";"
+                + def.to.pileIdx + ")";
+    }
 }

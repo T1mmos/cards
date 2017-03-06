@@ -10,6 +10,10 @@ public class ChainCommand implements Command {
     public ChainCommand(Command... commands) {
         this.commands = commands;
     }
+    
+    public Command[] getCommands (){
+        return commands;
+    }
 
     @Override
     public void execute(State state) {

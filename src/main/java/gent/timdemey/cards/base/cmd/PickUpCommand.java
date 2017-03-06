@@ -43,4 +43,9 @@ public class PickUpCommand implements Command {
         return rules.isAllowed(state, def);
     }
 
+    @Override
+    public String toString() {
+        return "PICK UP " + def.howmany + " from (" + def.from.playerId + ";" + def.from.sort + ";"
+                + def.from.pileIdx + ") to TEMP";
+    }
 }
