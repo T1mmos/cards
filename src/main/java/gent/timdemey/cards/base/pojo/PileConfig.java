@@ -22,6 +22,10 @@ public final class PileConfig {
         List<Pile> pilesOfSort = piles.get(sort);
         pilesOfSort.add(pile);
     }
+    
+    public int getPileCount (String sort){
+        return piles.get(sort).size();
+    }
 
     public Pile getPile(String sort, int idx) {
         return piles.get(sort).get(idx);        

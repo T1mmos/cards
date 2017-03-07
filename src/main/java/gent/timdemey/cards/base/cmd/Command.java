@@ -1,5 +1,7 @@
 package gent.timdemey.cards.base.cmd;
 
+import java.util.List;
+
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.pojo.State;
 
@@ -15,4 +17,8 @@ public interface Command {
     public void rollback(State state);
 
     public boolean isAllowed(State state, Rules rules);
+    
+    public boolean isTemporary();
+    
+    public List<Command> cleanTemp (List<Command> temps);
 }

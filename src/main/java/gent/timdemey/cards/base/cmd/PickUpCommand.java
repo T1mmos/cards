@@ -45,7 +45,12 @@ public class PickUpCommand implements Command {
 
     @Override
     public String toString() {
-        return "PICK UP " + def.howmany + " from (" + def.from.playerId + ";" + def.from.sort + ";"
-                + def.from.pileIdx + ") to TEMP";
+        return "PICK UP " + def.howmany + " from (" + def + ") to TEMP";
+    }
+
+    @Override
+    public boolean isTemporary() {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

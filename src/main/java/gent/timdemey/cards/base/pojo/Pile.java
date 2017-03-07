@@ -91,6 +91,6 @@ public final class Pile {
 
     @Override
     public final String toString() {
-        return PojoUtils.pretty(this);
+        return PojoUtils.small(this);
     }
 }
