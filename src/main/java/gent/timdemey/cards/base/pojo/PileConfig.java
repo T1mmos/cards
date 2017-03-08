@@ -15,6 +15,9 @@ public final class PileConfig {
 
     public PileConfig() {
         this.piles = new HashMap<>();
+        List<Pile> tmpPiles = new ArrayList<>();
+        tmpPiles.add(new Pile());
+        this.piles.put(Sorts.TEMP, tmpPiles);
     }
 
     public void addPile(String sort, Pile pile) {

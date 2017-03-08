@@ -1,12 +1,15 @@
 package gent.timdemey.cards.base.pojo;
 
+/**
+ * Put down all cards from the TEMP pile onto a specified pile.
+ * @author TDME
+ *
+ */
 public class PutDownDef {
     public final PileDef to;
-    public final int howmany;
 
-    public PutDownDef(PileDef to, int howmany) {
+    public PutDownDef(PileDef to) {
         this.to = to;
-        this.howmany = howmany;
     }
 
     @Override

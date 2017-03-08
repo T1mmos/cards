@@ -5,6 +5,7 @@ import java.util.List;
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.pojo.Pile;
 import gent.timdemey.cards.base.pojo.PileDef;
+import gent.timdemey.cards.base.pojo.PojoUtils;
 import gent.timdemey.cards.base.pojo.PutDownDef;
 import gent.timdemey.cards.base.pojo.Sorts;
 import gent.timdemey.cards.base.pojo.State;
@@ -26,7 +27,7 @@ public class PutDownCommand extends Command {
     public void execute(List<Command> prevs, State state) {
         Pile frompile = state.getPlayer(def.to.playerId).getPileConfig().getPile(Sorts.TEMP, 0);
         Pile topile = state.getPile(def.to);
-        topile.add(frompile.removeTop(def.howmany));
+        topile.add(frompile.remove(0));
     }
 
     @Override
@@ -40,7 +41,7 @@ public class PutDownCommand extends Command {
 
     @Override
     public String toString() {
-        return "PUT DOWN " + def.howmany + " from TEMP on (" + def.to + ")";
+        return PojoUtils.pretty(def);
     }
 
     @Override

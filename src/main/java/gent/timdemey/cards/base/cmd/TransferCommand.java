@@ -43,7 +43,7 @@ public class TransferCommand extends Command {
         ChainException.checkCount(prevs, this, 0);
 
         PickUpDef pickup = new PickUpDef(def.from, def.howmany);
-        PutDownDef putdown = new PutDownDef(def.to, def.howmany);
+        PutDownDef putdown = new PutDownDef(def.to);
         Pile tmpPile = state.getPile(def.from).peekPile(def.howmany);
         return rules.canPickUp(state, pickup) && rules.canPutDown(state, putdown, tmpPile);
     }

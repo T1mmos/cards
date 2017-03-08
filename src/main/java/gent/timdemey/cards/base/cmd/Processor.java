@@ -17,29 +17,29 @@ public class Processor {
     }
 
     public void process(String source, Command c) {
-        if (!state.isPlayer(source)){
+        if (!state.isPlayer(source)) {
             throw new UnsupportedOperationException("no server developments done yet");
-        } 
-        
+        }
+
         Player player = state.getPlayer(source);
         List<Command> tmps = player.getIntermediates();
         if (!c.isAllowed(tmps, state, rules)) { // throws ChainException
             clearIntermediates(player);
             return;
         }
-        
+
         c.execute(tmps, state);
-        
+
         switch (c.getType()) {
             case INTERMEDIATE:
                 tmps.add(c);
                 break;
             case MERGER:
                 Command merged = c.merge(tmps);
-                addDone(player, merged);
+                addStandalone(player, merged);
                 break;
             case STANDALONE:
-                addDone(player, c);
+                addStandalone(player, c);
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported type: " + c.getType());
@@ -50,33 +50,38 @@ public class Processor {
         // first rollback intermediate commands
         Player p = state.getLocalPlayer();
         clearIntermediates(p);
-        
+
         // rollback last
         int done = p.getDone();
         done--;
-        p.getExecuted().get(done).rollback(state);        
+        p.getExecuted().get(done).rollback(state);
         p.setDone(done);
     }
-    
+
     public void redo() {
-        
+
     }
 
-    private void clearIntermediates (Player p){
+    private void clearIntermediates(Player p) {
         List<Command> tmps = p.getIntermediates();
-     // clean up temps
-        for (int i = tmps.size() - 1; i >= 0; i--){
+        // clean up temps
+        for (int i = tmps.size() - 1; i >= 0; i--) {
             tmps.get(i).rollback(state);
         }
         tmps.clear();
     }
-    
-    private void addDone(Player p, Command c) {
-        if (c.getType() != CmdType.STANDALONE) {
-            throw new IllegalArgumentException("Can only add commands to execution list of type " + CmdType.STANDALONE);
+
+    private void addStandalone(Player p, Command c) {
+        if (c != null) {
+            if (c.getType() != CmdType.STANDALONE) {
+                throw new IllegalArgumentException(
+                        "Can only add commands to execution list only accepte " + CmdType.STANDALONE);
+            }
+            p.getExecuted().add(c);
+            p.setDone(p.getExecuted().size());
         }
-        p.getExecuted().add(c);
-        p.setDone(p.getExecuted().size());
-        p.getIntermediates().clear();        
+        
+        // in any case, clear the temps
+        p.getIntermediates().clear();
     }
 }

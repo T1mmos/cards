@@ -13,7 +13,7 @@ import gent.timdemey.cards.base.pojo.Message;
 
 public class Messenger {
     
-    private final Gson gson;
+    public final Gson gson;
     
     public Messenger (){
         RuntimeTypeAdapterFactory<Command> cmdAdap = RuntimeTypeAdapterFactory.of(Command.class);
@@ -30,6 +30,4 @@ public class Messenger {
         System.out.println("SENDING:");
         System.out.println(gson.toJson(msg));
     }
-    
-    
 }

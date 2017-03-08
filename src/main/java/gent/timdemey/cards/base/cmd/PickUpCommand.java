@@ -5,6 +5,7 @@ import java.util.List;
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.pojo.PickUpDef;
 import gent.timdemey.cards.base.pojo.Pile;
+import gent.timdemey.cards.base.pojo.PojoUtils;
 import gent.timdemey.cards.base.pojo.Sorts;
 import gent.timdemey.cards.base.pojo.State;
 
@@ -53,7 +54,7 @@ public class PickUpCommand extends Command {
     
     @Override
     public String toString() {
-        return "PICK UP " + def.howmany + " from (" + def + ") to TEMP";
+        return PojoUtils.pretty(def);
     }
 
     @Override

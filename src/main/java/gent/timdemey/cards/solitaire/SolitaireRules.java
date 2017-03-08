@@ -50,7 +50,7 @@ public class SolitaireRules implements Rules {
             case SolitaireSorts.FOUNDATION:
                 Card tmpcard = pile.peekCardAt(0);
                 Card topcard = topile.peekCard();
-                return def.howmany == 1 && tmpcard.getSuit() == topcard.getSuit()
+                return pile.size() == 1 && tmpcard.getSuit() == topcard.getSuit()
                         && tmpcard.getKind().getValue() == topcard.getKind().getValue() - 1;
             default:
                 throw new UnsupportedOperationException("Undefined rule: " + def);
