@@ -6,7 +6,6 @@ import gent.timdemey.cards.base.pojo.Kind;
 import gent.timdemey.cards.base.pojo.PickUpDef;
 import gent.timdemey.cards.base.pojo.Pile;
 import gent.timdemey.cards.base.pojo.PutDownDef;
-import gent.timdemey.cards.base.pojo.Sorts;
 import gent.timdemey.cards.base.pojo.State;
 import gent.timdemey.cards.base.pojo.TransferDef;
 
@@ -17,7 +16,7 @@ public class SolitaireRules implements Rules {
     }
 
     @Override
-    public boolean isAllowed(State state, PickUpDef def) {
+    public boolean canPickUp(State state, PickUpDef def) {
         Pile frompile = state.getPile(def.from);
 
         if (!frompile.isVisible(def.howmany)) {
@@ -39,18 +38,17 @@ public class SolitaireRules implements Rules {
     }
 
     @Override
-    public boolean isAllowed(State state, PutDownDef def) {
+    public boolean canPutDown(State state, PutDownDef def, Pile pile) {
         Pile topile = state.getPile(def.to);
-        Pile tmp = state.getPlayer(def.to.playerId).getPileConfig().getPile(Sorts.TEMP, 0);
 
         switch (def.to.sort) {
             case SolitaireSorts.STOCK:
             case SolitaireSorts.TALON:
                 return false;
             case SolitaireSorts.TABLEAU:
-                return tmp.peekCardAt(0).getSuit().getColor() != topile.peekCard().getSuit().getColor();
+                return pile.peekCardAt(0).getSuit().getColor() != topile.peekCard().getSuit().getColor();
             case SolitaireSorts.FOUNDATION:
-                Card tmpcard = tmp.peekCardAt(0);
+                Card tmpcard = pile.peekCardAt(0);
                 Card topcard = topile.peekCard();
                 return def.howmany == 1 && tmpcard.getSuit() == topcard.getSuit()
                         && tmpcard.getKind().getValue() == topcard.getKind().getValue() - 1;
@@ -58,9 +56,24 @@ public class SolitaireRules implements Rules {
                 throw new UnsupportedOperationException("Undefined rule: " + def);
         }
     }
+    
+    @Override
+    public String getAutoTransferDestination(State state, String sort) {
+        switch (sort) {
+            case SolitaireSorts.STOCK:
+                return SolitaireSorts.TALON;
+            case SolitaireSorts.TALON:                
+            case SolitaireSorts.TABLEAU:
+                return SolitaireSorts.FOUNDATION;
+            case SolitaireSorts.FOUNDATION:
+                return null;
+            default:
+                throw new UnsupportedOperationException("Undefined sort: " + sort);
+        }
+    }
 
     @Override
-    public boolean isAllowed(State state, TransferDef def) {
+    public boolean canAutoTransfer(State state, TransferDef def) {
         switch (def.from.sort) {
             case SolitaireSorts.STOCK:
                 return def.howmany == 3 && SolitaireSorts.TALON.equals(def.to.sort);
@@ -86,21 +99,6 @@ public class SolitaireRules implements Rules {
                 return false;
             default:
                 throw new UnsupportedOperationException("Undefined rule: " + def);
-        }
-    }
-
-    @Override
-    public String getDefaultTransferDestination(State state, String sort) {
-        switch (sort) {
-            case SolitaireSorts.STOCK:
-                return SolitaireSorts.TALON;
-            case SolitaireSorts.TALON:                
-            case SolitaireSorts.TABLEAU:
-                return SolitaireSorts.FOUNDATION;
-            case SolitaireSorts.FOUNDATION:
-                return null;
-            default:
-                throw new UnsupportedOperationException("Undefined sort: " + sort);
         }
     }
 }

@@ -22,8 +22,16 @@ public class State {
     public Player getLocalPlayer() {
         return getPlayer(localId);
     }
-    
-    public Pile getPile(PileDef def){
+
+    public boolean isLocalPlayer(String id) {
+        return getLocalPlayer().getId().equals(id);
+    }
+
+    public boolean isPlayer (String id){
+        return players.stream().filter(p -> p.getId().equals(id)).collect(Collectors.toList()).size() != 0;
+    }
+
+    public Pile getPile(PileDef def) {
         return getPlayer(def.playerId).getPileConfig().getPile(def.sort, def.pileIdx);
     }
 
@@ -39,7 +47,7 @@ public class State {
     public Player getGhostPlayer() {
         return ghost;
     }
-    
+
     @Override
     public String toString() {
         return PojoUtils.pretty(this);

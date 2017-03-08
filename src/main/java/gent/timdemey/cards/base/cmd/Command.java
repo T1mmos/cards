@@ -10,15 +10,27 @@ import gent.timdemey.cards.base.pojo.State;
  * and has the ability to undo that step as well.
  * 
  */
-public interface Command {
-    
-    public void execute(State state);
+public abstract class Command {
 
-    public void rollback(State state);
+    public abstract void execute(List<Command> prevs, State state);
 
-    public boolean isAllowed(State state, Rules rules);
-    
-    public boolean isTemporary();
-    
-    public List<Command> cleanTemp (List<Command> temps);
+    public void rollback(State state){
+        if (getType() == CmdType.MERGER) {
+            throw new UnsupportedOperationException("This is a merger command, this method shouldn't be called!");
+        } else {
+            throw new UnsupportedOperationException("This is not a merger command, please provide a rollback implementation!");
+        }
+    }
+
+    public abstract CmdType getType();
+
+    public Command merge(List<Command> prevs) {
+        if (getType() == CmdType.MERGER) {
+            throw new UnsupportedOperationException("This is a merger command, subclass should override this method!");
+        } else {
+            throw new UnsupportedOperationException("This is not a merger command, this method shouldn't be called!");
+        }
+    }
+
+    public abstract boolean isAllowed(List<Command> prevs, State state, Rules rules) throws ChainException;
 }

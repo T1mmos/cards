@@ -38,4 +38,6 @@ public enum Kind {
     public int getValue() {
         return value;
     }
+    
+    
 }

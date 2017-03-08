@@ -1,5 +1,7 @@
 package gent.timdemey.cards.base.cmd;
 
+import java.util.List;
+
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.pojo.PickUpDef;
 import gent.timdemey.cards.base.pojo.Pile;
@@ -11,7 +13,7 @@ import gent.timdemey.cards.base.pojo.State;
  * 
  *
  */
-public class PickUpCommand implements Command {
+public class PickUpCommand extends Command {
 
     private final PickUpDef def;
 
@@ -19,8 +21,12 @@ public class PickUpCommand implements Command {
         this.def = def;
     }
 
+    public PickUpDef getDef() {
+        return def;
+    }
+
     @Override
-    public void execute(State state) {
+    public void execute(List<Command> prevs, State state) {
         Pile frompile = state.getPile(def.from);
         Pile topile = state.getPlayer(def.from.playerId).getPileConfig().getPile(Sorts.TEMP, 0);
         topile.add(frompile.removeTop(def.howmany));
@@ -34,23 +40,26 @@ public class PickUpCommand implements Command {
     }
 
     @Override
-    public boolean isAllowed(State state, Rules rules) {
+    public boolean isAllowed(List<Command> prevs, State state, Rules rules) throws ChainException {
+        ChainException.checkCount(prevs, this, 0);
+
         Pile frompile = state.getPile(def.from);
         if (def.howmany > frompile.size()) {
             return false;
         }
 
-        return rules.isAllowed(state, def);
+        return rules.canPickUp(state, def);
     }
-
+    
     @Override
     public String toString() {
         return "PICK UP " + def.howmany + " from (" + def + ") to TEMP";
     }
 
     @Override
-    public boolean isTemporary() {
-        // TODO Auto-generated method stub
-        return false;
+    public CmdType getType() {
+        return CmdType.INTERMEDIATE;
     }
+    
+    
 }

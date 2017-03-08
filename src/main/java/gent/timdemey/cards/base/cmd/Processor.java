@@ -1,39 +1,82 @@
 package gent.timdemey.cards.base.cmd;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import gent.timdemey.cards.base.logic.Rules;
+import gent.timdemey.cards.base.pojo.Player;
 import gent.timdemey.cards.base.pojo.State;
 
-public final class Processor {
-    
+public class Processor {
+
     private final Rules rules;
     private final State state;
-    private final List<Command> cmds;
-    private int pDone = 0;
-    
-    public Processor (Rules rules, State state){
+
+    public Processor(Rules rules, State state) {
         this.rules = rules;
         this.state = state;
-        this.cmds = new ArrayList<>();
     }
-    
-    public void process (Command c){
-        
-        if (c.isAllowed(state, rules)){
-            c.execute(state);
-            cmds.set(pDone++, c);
-            cmds.subList(pDone, cmds.size()).clear();
+
+    public void process(String source, Command c) {
+        if (!state.isPlayer(source)){
+            throw new UnsupportedOperationException("no server developments done yet");
         } 
+        
+        Player player = state.getPlayer(source);
+        List<Command> tmps = player.getIntermediates();
+        if (!c.isAllowed(tmps, state, rules)) { // throws ChainException
+            clearIntermediates(player);
+            return;
+        }
+        
+        c.execute(tmps, state);
+        
+        switch (c.getType()) {
+            case INTERMEDIATE:
+                tmps.add(c);
+                break;
+            case MERGER:
+                Command merged = c.merge(tmps);
+                addDone(player, merged);
+                break;
+            case STANDALONE:
+                addDone(player, c);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported type: " + c.getType());
+        }
+    }
+
+    public void undo() {
+        // first rollback intermediate commands
+        Player p = state.getLocalPlayer();
+        clearIntermediates(p);
+        
+        // rollback last
+        int done = p.getDone();
+        done--;
+        p.getExecuted().get(done).rollback(state);        
+        p.setDone(done);
     }
     
-        
-    public void undo (){
+    public void redo() {
         
     }
+
+    private void clearIntermediates (Player p){
+        List<Command> tmps = p.getIntermediates();
+     // clean up temps
+        for (int i = tmps.size() - 1; i >= 0; i--){
+            tmps.get(i).rollback(state);
+        }
+        tmps.clear();
+    }
     
-    public void undo (int position){
-        
+    private void addDone(Player p, Command c) {
+        if (c.getType() != CmdType.STANDALONE) {
+            throw new IllegalArgumentException("Can only add commands to execution list of type " + CmdType.STANDALONE);
+        }
+        p.getExecuted().add(c);
+        p.setDone(p.getExecuted().size());
+        p.getIntermediates().clear();        
     }
 }
