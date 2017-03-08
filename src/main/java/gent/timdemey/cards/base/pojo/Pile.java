@@ -13,7 +13,7 @@ public final class Pile {
     }
 
     public Pile(List<Card> cards) {
-        this.cards = cards;
+        this.cards = new ArrayList<>(cards);
     }
 
     public boolean isEmpty (){

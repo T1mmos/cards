@@ -3,8 +3,6 @@ package gent.timdemey.cards.base.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
-import gent.timdemey.cards.base.pojo.CommandWrapper;
-import gent.timdemey.cards.base.pojo.Message;
 import gent.timdemey.cards.base.pojo.PojoUtils;
 
 public class ChainException extends RuntimeException {
