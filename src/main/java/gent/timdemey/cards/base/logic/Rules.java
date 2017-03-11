@@ -1,21 +1,23 @@
 package gent.timdemey.cards.base.logic;
 
-import gent.timdemey.cards.base.pojo.Card;
-import gent.timdemey.cards.base.pojo.PickUpDef;
-import gent.timdemey.cards.base.pojo.Pile;
-import gent.timdemey.cards.base.pojo.PutDownDef;
-import gent.timdemey.cards.base.pojo.State;
-import gent.timdemey.cards.base.pojo.TransferDef;
+import gent.timdemey.cards.base.processing.CLT_PickUp;
+import gent.timdemey.cards.base.processing.CLT_PutDown;
+import gent.timdemey.cards.base.state.Game;
+import gent.timdemey.cards.base.beans.B_Card;
+import gent.timdemey.cards.base.beans.B_Pile;
+import gent.timdemey.cards.base.processing.ALL_TransferCommand;
 
 public interface Rules {
 
-    public int revalue(Card card);
-
-    public boolean canPickUp(State state, PickUpDef def);
-
-    public boolean canPutDown(State state, PutDownDef def, Pile pile);
+    public int getMaxPlayers();
     
-    public boolean canAutoTransfer(State state, TransferDef def);
+    public int revalue(B_Card card);
+
+    public boolean canPickUp(Game state, CLT_PickUp cmd);
+
+    public boolean canPutDown(Game state, CLT_PutDown cmd, B_Pile pile);
+    
+    public boolean canAutoTransfer(Game state, ALL_TransferCommand cmd);
     
     
 
@@ -28,6 +30,6 @@ public interface Rules {
      * @return the destination to transfer cards to, or null if cards cannot be
      *         transfered
      */
-    public String getAutoTransferDestination(State state, String sort);
+    public String getAutoTransferDestination(Game state, String sort);
 
 }

@@ -12,23 +12,23 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import gent.timdemey.cards.base.pojo.Card;
-import gent.timdemey.cards.base.pojo.Suit;
+import gent.timdemey.cards.base.beans.B_Card;
+import gent.timdemey.cards.base.beans.B_Suit;
 
 public class CardIcon {
 
-    private static final Map<Suit, String> suit2string = new HashMap<>();
+    private static final Map<B_Suit, String> suit2string = new HashMap<>();
     public static final int IMG_WIDTH = 100;
     public static final int IMG_HEIGHT = 150;
 
     static {
-        suit2string.put(Suit.CLUBS, "Clubs");
-        suit2string.put(Suit.HEARTS, "Hearts");
-        suit2string.put(Suit.SPADES, "Spades");
-        suit2string.put(Suit.DIAMONDS, "Diamonds");
+        suit2string.put(B_Suit.CLUBS, "Clubs");
+        suit2string.put(B_Suit.HEARTS, "Hearts");
+        suit2string.put(B_Suit.SPADES, "Spades");
+        suit2string.put(B_Suit.DIAMONDS, "Diamonds");
     }
 
-    public static Icon getIcon(Card card) {
+    public static Icon getIcon(B_Card card) {
         String path = suit2string.get(card.getSuit()) + "/" + card.getKind().getName() + ".png";
         return getIcon(path);
     }

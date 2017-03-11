@@ -1,10 +1,10 @@
 package gent.timdemey.cards.base;
 
-import gent.timdemey.cards.base.pojo.Card;
+import gent.timdemey.cards.base.beans.B_Card;
 
 public class App {
 
     public static void main(String[] args) {
-        Card.newSortedDeck().stream().forEach(System.out::println);
+        B_Card.newSortedDeck().stream().forEach(System.out::println);
     }
 }

@@ -13,39 +13,41 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import gent.timdemey.cards.base.beans.B_Card;
+import gent.timdemey.cards.base.beans.B_Pile;
+import gent.timdemey.cards.base.beans.B_PileConfig;
 import gent.timdemey.cards.base.icons.cards.CardIcon;
-import gent.timdemey.cards.base.pojo.Card;
-import gent.timdemey.cards.base.pojo.Pile;
-import gent.timdemey.cards.base.pojo.PileConfig;
-import gent.timdemey.cards.base.pojo.Player;
-import gent.timdemey.cards.base.pojo.State;
+import gent.timdemey.cards.base.processing.CLT_PutDown;
+import gent.timdemey.cards.base.state.Game;
+import gent.timdemey.cards.base.state.Player;
 
 public class Solitaire {
     public static void main(String[] args) {
-        PileConfig pcfg = new PileConfig();
-        List<Card> deck = Card.newShuffledDeck();
+        B_PileConfig pcfg = new B_PileConfig();
+        List<B_Card> deck = B_Card.newShuffledDeck();
 
-        pcfg.addPile(SolitaireSorts.TABLEAU, new Pile(deck.subList(0, 1)));
-        pcfg.addPile(SolitaireSorts.TABLEAU, new Pile(deck.subList(1, 3)));
-        pcfg.addPile(SolitaireSorts.TABLEAU, new Pile(deck.subList(3, 6)));
-        pcfg.addPile(SolitaireSorts.TABLEAU, new Pile(deck.subList(6, 10)));
-        pcfg.addPile(SolitaireSorts.TABLEAU, new Pile(deck.subList(10, 15)));
-        pcfg.addPile(SolitaireSorts.TABLEAU, new Pile(deck.subList(15, 21)));
-        pcfg.addPile(SolitaireSorts.TABLEAU, new Pile(deck.subList(21, 28)));
-        pcfg.addPile(SolitaireSorts.STOCK, new Pile(deck.subList(21, 52)));
-        pcfg.addPile(SolitaireSorts.TALON, new Pile());
-        pcfg.addPile(SolitaireSorts.FOUNDATION, new Pile());
-        pcfg.addPile(SolitaireSorts.FOUNDATION, new Pile());
-        pcfg.addPile(SolitaireSorts.FOUNDATION, new Pile());
-        pcfg.addPile(SolitaireSorts.FOUNDATION, new Pile());
+        pcfg.addPile(SolitaireSorts.TABLEAU, new B_Pile(deck.subList(0, 1)));
+        pcfg.addPile(SolitaireSorts.TABLEAU, new B_Pile(deck.subList(1, 3)));
+        pcfg.addPile(SolitaireSorts.TABLEAU, new B_Pile(deck.subList(3, 6)));
+        pcfg.addPile(SolitaireSorts.TABLEAU, new B_Pile(deck.subList(6, 10)));
+        pcfg.addPile(SolitaireSorts.TABLEAU, new B_Pile(deck.subList(10, 15)));
+        pcfg.addPile(SolitaireSorts.TABLEAU, new B_Pile(deck.subList(15, 21)));
+        pcfg.addPile(SolitaireSorts.TABLEAU, new B_Pile(deck.subList(21, 28)));
+        pcfg.addPile(SolitaireSorts.STOCK, new B_Pile(deck.subList(21, 52)));
+        pcfg.addPile(SolitaireSorts.TALON, new B_Pile());
+        pcfg.addPile(SolitaireSorts.FOUNDATION, new B_Pile());
+        pcfg.addPile(SolitaireSorts.FOUNDATION, new B_Pile());
+        pcfg.addPile(SolitaireSorts.FOUNDATION, new B_Pile());
+        pcfg.addPile(SolitaireSorts.FOUNDATION, new B_Pile());
 
+        
         Player player = new Player("local", "localname", pcfg);
-        State state = new State(Arrays.asList(player), null, "local");
+        Game state = new Game(Arrays.asList(player), null, "local");
 
         SwingUtilities.invokeLater(() -> startUI(state));
     }
 
-    private static void startUI(State state) {
+    private static void startUI(Game state) {
         JFrame frame = new JFrame();
         JPanel content = buildCardPanel(state);
 
@@ -56,7 +58,7 @@ public class Solitaire {
         frame.setVisible(true);
     }
 
-    private static JPanel buildCardPanel(State state) {
+    private static JPanel buildCardPanel(Game state) {
         JPanel panel = new JPanel(null);
 
         JLabel cover = buildCoverLabel();
@@ -70,9 +72,9 @@ public class Solitaire {
         }
 
         for (int pidx = 0; pidx < 7; pidx++) {
-            Pile pile = state.getPlayer("local").getPileConfig().getPile(SolitaireSorts.TABLEAU, pidx);
+            B_Pile pile = state.getPlayer("local").getPileConfig().getPile(SolitaireSorts.TABLEAU, pidx);
             for (int i = pile.size() - 1; i >= 0; i--) {
-                Card card = pile.peekCardAt(i);
+                B_Card card = pile.peekCardAt(i);
                 JLabel label = buildCardLabel(card);
                 label.setLocation(20 + pidx * (label.getWidth() + 20), 200 + i * 30);
                 panel.add(label);
@@ -82,7 +84,7 @@ public class Solitaire {
         return panel;
     }
 
-    private static JLabel buildCardLabel(Card card) {
+    private static JLabel buildCardLabel(B_Card card) {
         return buildLabel(CardIcon.getIcon(card));
     }
 

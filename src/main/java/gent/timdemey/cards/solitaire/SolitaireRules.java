@@ -1,23 +1,26 @@
 package gent.timdemey.cards.solitaire;
 
+import gent.timdemey.cards.base.beans.B_Card;
+import gent.timdemey.cards.base.beans.B_Kind;
+import gent.timdemey.cards.base.beans.PickUpDef;
+import gent.timdemey.cards.base.beans.B_Pile;
+import gent.timdemey.cards.base.beans.PutDownDef;
+import gent.timdemey.cards.base.beans.TransferDef;
 import gent.timdemey.cards.base.logic.Rules;
-import gent.timdemey.cards.base.pojo.Card;
-import gent.timdemey.cards.base.pojo.Kind;
-import gent.timdemey.cards.base.pojo.PickUpDef;
-import gent.timdemey.cards.base.pojo.Pile;
-import gent.timdemey.cards.base.pojo.PutDownDef;
-import gent.timdemey.cards.base.pojo.State;
-import gent.timdemey.cards.base.pojo.TransferDef;
+import gent.timdemey.cards.base.processing.ALL_TransferCommand;
+import gent.timdemey.cards.base.processing.CLT_PickUp;
+import gent.timdemey.cards.base.processing.CLT_PutDown;
+import gent.timdemey.cards.base.state.Game;
 
 public class SolitaireRules implements Rules {
 
-    public int revalue(Card card) {
+    public int revalue(B_Card card) {
         return card.getKind().getValue();
     }
 
     @Override
-    public boolean canPickUp(State state, PickUpDef def) {
-        Pile frompile = state.getPile(def.from);
+    public boolean canPickUp(Game state, PickUpDef def) {
+        B_Pile frompile = state.getPile(def.from);
 
         if (!frompile.isVisible(def.howmany)) {
             return false;
@@ -38,8 +41,8 @@ public class SolitaireRules implements Rules {
     }
 
     @Override
-    public boolean canPutDown(State state, PutDownDef def, Pile pile) {
-        Pile topile = state.getPile(def.to);
+    public boolean canPutDown(Game state, PutDownDef def, B_Pile pile) {
+        B_Pile topile = state.getPile(def.to);
 
         switch (def.to.sort) {
             case SolitaireSorts.STOCK:
@@ -48,8 +51,8 @@ public class SolitaireRules implements Rules {
             case SolitaireSorts.TABLEAU:
                 return pile.peekCardAt(0).getSuit().getColor() != topile.peekCard().getSuit().getColor();
             case SolitaireSorts.FOUNDATION:
-                Card tmpcard = pile.peekCardAt(0);
-                Card topcard = topile.peekCard();
+                B_Card tmpcard = pile.peekCardAt(0);
+                B_Card topcard = topile.peekCard();
                 return pile.size() == 1 && tmpcard.getSuit() == topcard.getSuit()
                         && tmpcard.getKind().getValue() == topcard.getKind().getValue() - 1;
             default:
@@ -58,7 +61,7 @@ public class SolitaireRules implements Rules {
     }
     
     @Override
-    public String getAutoTransferDestination(State state, String sort) {
+    public String getAutoTransferDestination(Game state, String sort) {
         switch (sort) {
             case SolitaireSorts.STOCK:
                 return SolitaireSorts.TALON;
@@ -73,7 +76,7 @@ public class SolitaireRules implements Rules {
     }
 
     @Override
-    public boolean canAutoTransfer(State state, TransferDef def) {
+    public boolean canAutoTransfer(Game state, TransferDef def) {
         switch (def.from.sort) {
             case SolitaireSorts.STOCK:
                 return def.howmany == 3 && SolitaireSorts.TALON.equals(def.to.sort);
@@ -82,13 +85,13 @@ public class SolitaireRules implements Rules {
                 if (def.howmany != 1 || !SolitaireSorts.FOUNDATION.equals(def.to.sort)) {
                     return false;
                 }
-                Pile to = state.getPile(def.to);
-                Pile from = state.getPile(def.from);
+                B_Pile to = state.getPile(def.to);
+                B_Pile from = state.getPile(def.from);
                 if (from.size() == 0) {
                     return false;
                 }
-                Card card = from.peekCard();
-                if (to.size() == 0 && card.getKind() != Kind.ACE) {
+                B_Card card = from.peekCard();
+                if (to.size() == 0 && card.getKind() != B_Kind.ACE) {
                     return false;
                 }
                 if (to.size() != 0 && card.getKind().getValue() != to.peekCard().getKind().getValue() + 1) {
@@ -100,5 +103,29 @@ public class SolitaireRules implements Rules {
             default:
                 throw new UnsupportedOperationException("Undefined rule: " + def);
         }
+    }
+
+    @Override
+    public int getMaxPlayers() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public boolean canPickUp(Game state, CLT_PickUp cmd) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean canPutDown(Game state, CLT_PutDown cmd, B_Pile pile) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean canAutoTransfer(Game state, ALL_TransferCommand cmd) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }
