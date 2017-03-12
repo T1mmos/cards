@@ -13,7 +13,7 @@ public final class B_PileDef {
 
     @Override
     public String toString() {
-        return PojoUtils.pretty(this);
+        return BeanUtils.pretty(this);
     }
     
 }

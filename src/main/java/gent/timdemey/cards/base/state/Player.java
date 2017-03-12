@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gent.timdemey.cards.base.beans.B_PileConfig;
-import gent.timdemey.cards.base.beans.PojoUtils;
+import gent.timdemey.cards.base.beans.BeanUtils;
 import gent.timdemey.cards.base.state.listeners.PlayerListener;
 
 public class Player {
@@ -58,6 +58,6 @@ public class Player {
     
     @Override
     public String toString() {
-        return PojoUtils.pretty(this);
+        return BeanUtils.pretty(this);
     }
 }

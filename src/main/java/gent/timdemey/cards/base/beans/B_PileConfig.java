@@ -60,6 +60,6 @@ public final class B_PileConfig {
 
     @Override
     public String toString() {
-        return PojoUtils.pretty(this);
+        return BeanUtils.pretty(this);
     }
 }

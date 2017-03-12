@@ -122,6 +122,6 @@ public class B_Card {
 
     @Override
     public String toString() {
-        return PojoUtils.pretty(this);
+        return BeanUtils.pretty(this);
     }
 }

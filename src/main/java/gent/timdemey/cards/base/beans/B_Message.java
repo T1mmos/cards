@@ -20,5 +20,9 @@ public class B_Message {
         return command;
     }
     
+    @Override
+    public String toString() {
+        return BeanUtils.pretty(this);
+    }
     
 }

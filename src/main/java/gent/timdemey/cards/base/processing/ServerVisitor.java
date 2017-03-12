@@ -20,11 +20,11 @@ public class ServerVisitor implements Visitor {
     @Override
     public void visit(CLT_Connect cmd) {
         if (Game.INSTANCE.getGameState() != B_GameState.Lobby) {
-            messenger.send(new B_Message(Game.INSTANCE.getLocalId(), new SRV_RejectConnect("Game already started.")));
+            messenger.write(new B_Message(Game.INSTANCE.getLocalId(), new SRV_RejectConnect("Game already started.")));
             return;
         }
         if (Game.INSTANCE.getPlayerCount() == rules.getMaxPlayers()) {
-            messenger.send(new B_Message(Game.INSTANCE.getLocalId(), new SRV_RejectConnect("Game full.")));
+            messenger.write(new B_Message(Game.INSTANCE.getLocalId(), new SRV_RejectConnect("Game full.")));
             return;
         }
 
@@ -33,7 +33,7 @@ public class ServerVisitor implements Visitor {
             unique_id = StringUtils.getRandomString(16);
         } while (Game.INSTANCE.isPlayer(unique_id));
         Game.INSTANCE.addPlayer(unique_id, cmd.name);
-        messenger.send(new B_Message(Game.INSTANCE.getLocalId(), new SRV_AcceptConnect(unique_id)));
+        messenger.write(new B_Message(Game.INSTANCE.getLocalId(), new SRV_AcceptConnect(unique_id)));
 
     }
 

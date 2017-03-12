@@ -3,7 +3,7 @@ package gent.timdemey.cards.base.processing;
 import java.util.ArrayList;
 import java.util.List;
 
-import gent.timdemey.cards.base.beans.PojoUtils;
+import gent.timdemey.cards.base.beans.BeanUtils;
 
 public class ChainException extends RuntimeException {
     private ChainException(String msg) {
@@ -26,7 +26,7 @@ public class ChainException extends RuntimeException {
             all.add(last);
 
             throw new ChainException("Command expected " + expected + " chains but got " + cmds.size()
-                    + ", all chains:\n" + PojoUtils.pretty(cmds));
+                    + ", all chains:\n" + BeanUtils.pretty(cmds));
         }
     }
 

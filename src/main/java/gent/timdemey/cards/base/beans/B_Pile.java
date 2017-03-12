@@ -91,6 +91,6 @@ public final class B_Pile {
 
     @Override
     public final String toString() {
-        return PojoUtils.small(this);
+        return BeanUtils.small(this);
     }
 }

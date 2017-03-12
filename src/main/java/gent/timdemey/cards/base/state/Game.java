@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import gent.timdemey.cards.base.beans.B_GameState;
 import gent.timdemey.cards.base.beans.B_Pile;
 import gent.timdemey.cards.base.beans.B_PileDef;
-import gent.timdemey.cards.base.beans.PojoUtils;
+import gent.timdemey.cards.base.beans.BeanUtils;
 
 public enum Game {
 
@@ -84,6 +84,6 @@ public enum Game {
 
     @Override
     public String toString() {
-        return PojoUtils.pretty(this);
+        return BeanUtils.pretty(this);
     }
 }

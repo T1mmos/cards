@@ -4,7 +4,7 @@ import java.util.List;
 
 import gent.timdemey.cards.base.beans.B_Pile;
 import gent.timdemey.cards.base.beans.B_PileDef;
-import gent.timdemey.cards.base.beans.PojoUtils;
+import gent.timdemey.cards.base.beans.BeanUtils;
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.state.Game;
 import gent.timdemey.cards.base.state.Sorts;
@@ -52,7 +52,7 @@ public class CLT_PickUp extends ALL_GameCommand {
 
     @Override
     public String toString() {
-        return PojoUtils.pretty(this);
+        return BeanUtils.pretty(this);
     }
 
     @Override
