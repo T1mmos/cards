@@ -13,7 +13,7 @@ public class ServerApp {
             ServerSocket ssocket = new ServerSocket(666);
             while (true){
                 Socket s = ssocket.accept();
-                Messenger messenger = new Messenger("test", s, msg -> handle(msg));
+                Messenger messenger = new Messenger("test", s, ServerApp::handle);
                 messenger.start();
             }
             

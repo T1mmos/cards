@@ -16,7 +16,7 @@ public class ClientApp {
         try {
             s = new Socket(InetAddress.getLocalHost(), 666);
 
-            Messenger m = new Messenger("client", s, msg -> handle(msg));
+            Messenger m = new Messenger("client", s, ClientApp::handle);
             m.write(new B_Message("client", new CLT_Connect("client")));
             
             Thread.sleep(5000);
