@@ -69,9 +69,18 @@ public enum Game {
     public Player getPlayer(String id) {
         return players.stream().filter(player -> player.getId().equals(id)).collect(Collectors.toList()).get(0);
     }
+    
+    public List<Player> getPlayers(){
+        return players;
+    }
 
     public int getPlayerCount (){
         return players.size();
+    }
+    
+    public void removePlayer(String id){
+        players.removeIf(p -> p.getId().equals(id));
+        System.out.println("Removed player: " + id);
     }
     
     public Player getLocalPlayer() {

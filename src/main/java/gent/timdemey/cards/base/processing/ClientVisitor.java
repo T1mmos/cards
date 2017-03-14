@@ -62,4 +62,9 @@ public class ClientVisitor implements Visitor {
     public void visit(SRV_InitPlayer cmd) {
         Game.INSTANCE.addPlayer(cmd.id, cmd.name);
     }
+
+    @Override
+    public void visit(SRV_RemovePlayer cmd) {
+        Game.INSTANCE.removePlayer(cmd.id);
+    }
 }

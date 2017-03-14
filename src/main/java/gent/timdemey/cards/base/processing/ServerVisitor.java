@@ -1,9 +1,12 @@
 package gent.timdemey.cards.base.processing;
 
+import java.util.List;
+
 import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.net.Messenger;
 import gent.timdemey.cards.base.state.Game;
+import gent.timdemey.cards.base.state.Player;
 
 public class ServerVisitor implements Visitor {
 
@@ -38,6 +41,13 @@ public class ServerVisitor implements Visitor {
 
     @Override
     public void visit(CLT_InitPlayer cmd) {
+        Game.INSTANCE.getPlayers().stream().forEach(p -> {
+            Command ret = new SRV_InitPlayer(p.getId(), p.getName());
+            ret.setSource("server");
+            ret.setDestination(cmd.getSource());
+            processor.process(ret);
+        });
+
         Game.INSTANCE.addPlayer(cmd.getSource(), cmd.name);
         Command ret = new SRV_InitPlayer(cmd.getSource(), cmd.name);
         ret.setSource("server");
@@ -47,6 +57,12 @@ public class ServerVisitor implements Visitor {
 
     @Override
     public void visit(SRV_InitPlayer cmd) {
+        messenger.write(new B_Message(cmd));
+    }
+
+    @Override
+    public void visit(SRV_RemovePlayer cmd) {
+        Game.INSTANCE.removePlayer(cmd.id);
         messenger.write(new B_Message(cmd));
     }
 }

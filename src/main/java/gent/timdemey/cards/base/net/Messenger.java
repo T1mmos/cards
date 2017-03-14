@@ -27,6 +27,7 @@ import gent.timdemey.cards.base.processing.CLT_TransferCommand;
 import gent.timdemey.cards.base.processing.Command;
 import gent.timdemey.cards.base.processing.SRV_AcceptConnect;
 import gent.timdemey.cards.base.processing.SRV_InitPlayer;
+import gent.timdemey.cards.base.processing.SRV_RemovePlayer;
 
 public class Messenger {
 
@@ -44,6 +45,7 @@ public class Messenger {
         GSON_COMMAND_ADAPTER.registerSubtype(CLT_RequestLobbyList.class, "RequestLobbyList");
         GSON_COMMAND_ADAPTER.registerSubtype(CLT_InitPlayer.class, "InitPlayer@Server");
         GSON_COMMAND_ADAPTER.registerSubtype(SRV_InitPlayer.class, "InitPlayer@Client");
+        GSON_COMMAND_ADAPTER.registerSubtype(SRV_RemovePlayer.class, "RemovePlayer");
 
         gson = new GsonBuilder().registerTypeAdapterFactory(GSON_COMMAND_ADAPTER).create();
     }
@@ -51,18 +53,20 @@ public class Messenger {
     public static class Connection {
 
         private final String name;
-        private final Socket socket;
-        private final Set<MessageListener> listeners;
-        private final Writer writer;
-        private final BufferedReader reader;
+        private final Set<MessageListener> msgListeners;
+        private final Set<ConnectionListener> connListeners;
+        private Writer writer;
+        private BufferedReader reader;
         private Thread readThr = null;
+        private Socket socket;
 
         private Connection(String name, Socket socket) throws IOException {
             this.name = name;
             this.socket = socket;
             this.writer = new PrintWriter(socket.getOutputStream());
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.listeners = ConcurrentHashMap.newKeySet();
+            this.msgListeners = ConcurrentHashMap.newKeySet();
+            this.connListeners = ConcurrentHashMap.newKeySet();
         }
 
         private void start() {
@@ -85,8 +89,6 @@ public class Messenger {
         }
 
         private void write(B_Message msg) {
-            String destination = checkNotNull(msg.getCommand().getDestination());
-
             String json = gson.toJson(msg) + "\n";
             try {
                 writer.write(json);
@@ -105,11 +107,22 @@ public class Messenger {
                     }
                     String line = reader.readLine();
                     B_Message msg = gson.fromJson(line, B_Message.class);
-                    listeners.stream().forEach(l -> l.onReceive(msg));
+                    msgListeners.stream().forEach(l -> l.onReceive(msg));
                 }
             } catch (IOException e) {
-                //
-                e.printStackTrace();
+                socket = null;
+                readThr = null;
+                try {
+                    reader.close();
+                } catch (IOException e2){
+                    System.out.println("Failed to close reader for connection to: " + name);
+                }
+                try {
+                    writer.close();
+                } catch (IOException e2){
+                    System.out.println("Failed to close writer for connection to: " + name);
+                }
+                connListeners.forEach(c -> c.onConnectionLost(name));
             }
         }
     }
@@ -120,12 +133,16 @@ public class Messenger {
         this.connections = new HashMap<>();
     }
 
-    public void addListener(String id, MessageListener msg) {
-        connections.get(id).listeners.add(msg);
+    public void addMessageListener(String id, MessageListener listener) {
+        connections.get(id).msgListeners.add(listener);
+    }
+
+    public void addConnectionListener(String id, ConnectionListener listener) {
+        connections.get(id).connListeners.add(listener);
     }
 
     public void write(B_Message msg) {
-        if ("broadcast".equals(msg.getCommand().getDestination())){
+        if ("broadcast".equals(msg.getCommand().getDestination())) {
             connections.values().stream().forEach(conn -> conn.write(msg));
         } else {
             connections.get(msg.getCommand().getDestination()).write(msg);
@@ -135,6 +152,7 @@ public class Messenger {
     public void addConnection(String name, Socket socket) throws IOException {
         Connection c = new Connection(name, socket);
         connections.put(name, c);
+        addConnectionListener(name, id -> connections.remove(id));
         c.start();
     }
 

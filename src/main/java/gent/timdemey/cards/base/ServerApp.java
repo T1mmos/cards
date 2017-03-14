@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import gent.timdemey.cards.base.beans.B_Message;
+import gent.timdemey.cards.base.net.MessageListener;
 import gent.timdemey.cards.base.net.Messenger;
 import gent.timdemey.cards.base.processing.Command;
 import gent.timdemey.cards.base.processing.Processor;
 import gent.timdemey.cards.base.processing.SRV_AcceptConnect;
+import gent.timdemey.cards.base.processing.SRV_RemovePlayer;
 import gent.timdemey.cards.base.processing.ServerVisitor;
 import gent.timdemey.cards.base.processing.Visitor;
 import gent.timdemey.cards.base.state.Game;
@@ -30,7 +33,13 @@ public class ServerApp {
                 } while (Game.INSTANCE.isPlayer(unique_id));
 
                 m.addConnection(unique_id, csocket);
-                m.addListener(unique_id, msg -> p.process(msg.getCommand()));
+                m.addMessageListener(unique_id, msg -> p.process(msg.getCommand()));
+                m.addConnectionListener(unique_id, id -> {
+                    Command cmd = new SRV_RemovePlayer(id);
+                    cmd.setSource("server");
+                    cmd.setDestination("broadcast");
+                    p.process(cmd);
+                });
 
                 Command c = new SRV_AcceptConnect(unique_id);
                 c.setSource("server");

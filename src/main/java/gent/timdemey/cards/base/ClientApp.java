@@ -38,7 +38,7 @@ public class ClientApp implements GameListener {
 
             Visitor v = new ClientVisitor(p, m, new SolitaireRules());
             p.addVisitor(v);
-            m.addListener("server", msg -> p.process(msg.getCommand()));
+            m.addMessageListener("server", msg -> p.process(msg.getCommand()));
 
             Thread.sleep(5000);
         } catch (UnknownHostException e) {

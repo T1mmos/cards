@@ -16,4 +16,6 @@ public interface Visitor {
     public void visit(CLT_InitPlayer cmd);
 
     public void visit (SRV_InitPlayer cmd);
+    
+    public void visit(SRV_RemovePlayer cmd);
 }
