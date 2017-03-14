@@ -12,22 +12,34 @@ import gent.timdemey.cards.base.processing.Command;
 import gent.timdemey.cards.base.processing.Processor;
 import gent.timdemey.cards.base.processing.Visitor;
 import gent.timdemey.cards.base.state.Game;
+import gent.timdemey.cards.base.state.Player;
+import gent.timdemey.cards.base.state.listeners.GameListener;
 import gent.timdemey.cards.solitaire.SolitaireRules;
 
-public class ClientApp {
+public class ClientApp implements GameListener {
 
+    private final Processor p = new Processor();
+    
     public static void main(String[] args) {
+        ClientApp app = new ClientApp();
+        Game.INSTANCE.addListener(app);
+
+        app.start();
+    }
+
+    private void start() {
+        
         Socket s;
         try {
             s = new Socket(InetAddress.getLocalHost(), 666);
 
             Messenger m = new Messenger();
             m.addConnection("server", s);
-            Processor p = new Processor();
+
             Visitor v = new ClientVisitor(p, m, new SolitaireRules());
             p.addVisitor(v);
             m.addListener("server", msg -> p.process(msg.getCommand()));
-            
+
             Thread.sleep(5000);
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
@@ -39,6 +51,25 @@ public class ClientApp {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void stateChanged(Game state) {
+        System.out.println("State changed");
+    }
+
+    @Override
+    public void playerAdded(Player p) {
+        System.out.println("Player added: " + p);
+    }
+
+    @Override
+    public void idAssigned(String id) {
+        System.out.println("Got assigned ID " + id);
         
+        Command c = new CLT_InitPlayer("Tim");
+        c.setDestination("server");
+        c.setSource(Game.INSTANCE.getLocalId());
+        p.process(c);
     }
 }

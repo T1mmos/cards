@@ -9,10 +9,10 @@ import gent.timdemey.cards.base.state.listeners.PlayerListener;
 
 public class Player {
 
-    private final List<PlayerListener> lstrs;
-    private int pDone = 0;
+    private final transient List<PlayerListener> lstrs;
+    private transient int pDone = 0;
     private B_PileConfig pilecfg = null;
-    
+
     private final String id;
     private String name;
 
@@ -30,34 +30,34 @@ public class Player {
         return name;
     }
 
-    public void setName (String name){
+    public void setName(String name) {
         this.name = name;
         lstrs.stream().forEach(l -> l.nameChanged(this));
     }
-    
-    public void setPileConfig (B_PileConfig cfg){
+
+    public void setPileConfig(B_PileConfig cfg) {
         this.pilecfg = cfg;
         lstrs.stream().forEach(l -> l.pileConfigChanged(this));
     }
-    
+
     public B_PileConfig getPileConfig() {
         return pilecfg;
     }
-    
-    public void setDone (int done){
+
+    public void setDone(int done) {
         this.pDone = done;
     }
-    
-    public int getDone (){
+
+    public int getDone() {
         return pDone;
     }
-    
-    public void addListener (PlayerListener l){
+
+    public void addListener(PlayerListener l) {
         lstrs.add(l);
     }
-    
+
     @Override
     public String toString() {
-        return BeanUtils.pretty(this);
+        return BeanUtils.small(this);
     }
 }

@@ -8,6 +8,7 @@ import gent.timdemey.cards.base.beans.B_GameState;
 import gent.timdemey.cards.base.beans.B_Pile;
 import gent.timdemey.cards.base.beans.B_PileDef;
 import gent.timdemey.cards.base.beans.BeanUtils;
+import gent.timdemey.cards.base.state.listeners.GameListener;
 
 public enum Game {
 
@@ -16,12 +17,14 @@ public enum Game {
     private B_GameState state;
     private final List<Lobby> lobbies;
     private final List<Player> players;
+    private final List<GameListener> listeners;
     private String localId;
 
     private Game() {
         this.state = B_GameState.Lobby;
         this.players = new ArrayList<>();
         this.lobbies = new ArrayList<>();
+        this.listeners = new ArrayList<>();
     }
     
     public String getLocalId (){
@@ -30,7 +33,7 @@ public enum Game {
     
     public void setLocalId (String id){
         this.localId = id;
-        System.out.println("Local ID set to: " + id);
+        listeners.forEach(l -> l.idAssigned(localId));
     }
     
     public B_GameState getGameState (){
@@ -53,10 +56,14 @@ public enum Game {
         lobbies.remove(lobby);
     }
     
-    public Player addPlayer (String id, String name){
+    public void addPlayer (String id, String name){
         Player player = new Player(id, name);
         players.add(player);
-        return player;
+        listeners.forEach(l -> l.playerAdded(player));
+    }
+    
+    public void addListener (GameListener listener ){
+        listeners.add(listener);
     }
     
     public Player getPlayer(String id) {

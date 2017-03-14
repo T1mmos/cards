@@ -44,12 +44,6 @@ public class ClientVisitor implements Visitor {
     @Override
     public void visit(SRV_AcceptConnect cmd) {
         Game.INSTANCE.setLocalId(cmd.assigned_id);
-        
-
-        Command c = new CLT_InitPlayer("Tim");
-        c.setDestination("server");
-        c.setSource(Game.INSTANCE.getLocalId());
-        processor.process(c);
     }
 
     @Override
@@ -62,5 +56,10 @@ public class ClientVisitor implements Visitor {
     public void visit(CLT_InitPlayer cmd) {
         cmd.setDestination("server");
         messenger.write(new B_Message(cmd));
+    }
+
+    @Override
+    public void visit(SRV_InitPlayer cmd) {
+        Game.INSTANCE.addPlayer(cmd.id, cmd.name);
     }
 }

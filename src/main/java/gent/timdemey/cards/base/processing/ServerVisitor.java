@@ -39,7 +39,14 @@ public class ServerVisitor implements Visitor {
     @Override
     public void visit(CLT_InitPlayer cmd) {
         Game.INSTANCE.addPlayer(cmd.getSource(), cmd.name);
-        System.out.println(Game.INSTANCE.getPlayerCount());
-        System.out.println(Game.INSTANCE.getPlayer(cmd.getSource()));
+        Command ret = new SRV_InitPlayer(cmd.getSource(), cmd.name);
+        ret.setSource("server");
+        ret.setDestination("broadcast");
+        processor.process(ret);
+    }
+
+    @Override
+    public void visit(SRV_InitPlayer cmd) {
+        messenger.write(new B_Message(cmd));
     }
 }

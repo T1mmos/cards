@@ -26,6 +26,7 @@ import gent.timdemey.cards.base.processing.CLT_RequestLobbyList;
 import gent.timdemey.cards.base.processing.CLT_TransferCommand;
 import gent.timdemey.cards.base.processing.Command;
 import gent.timdemey.cards.base.processing.SRV_AcceptConnect;
+import gent.timdemey.cards.base.processing.SRV_InitPlayer;
 
 public class Messenger {
 
@@ -41,7 +42,8 @@ public class Messenger {
         GSON_COMMAND_ADAPTER.registerSubtype(CLT_TransferCommand.class, "Transfer");
         GSON_COMMAND_ADAPTER.registerSubtype(SRV_AcceptConnect.class, "AcceptConnect");
         GSON_COMMAND_ADAPTER.registerSubtype(CLT_RequestLobbyList.class, "RequestLobbyList");
-        GSON_COMMAND_ADAPTER.registerSubtype(CLT_InitPlayer.class, "InitPlayer");
+        GSON_COMMAND_ADAPTER.registerSubtype(CLT_InitPlayer.class, "InitPlayer@Server");
+        GSON_COMMAND_ADAPTER.registerSubtype(SRV_InitPlayer.class, "InitPlayer@Client");
 
         gson = new GsonBuilder().registerTypeAdapterFactory(GSON_COMMAND_ADAPTER).create();
     }
@@ -123,7 +125,11 @@ public class Messenger {
     }
 
     public void write(B_Message msg) {
-        connections.get(msg.getCommand().getDestination()).write(msg);
+        if ("broadcast".equals(msg.getCommand().getDestination())){
+            connections.values().stream().forEach(conn -> conn.write(msg));
+        } else {
+            connections.get(msg.getCommand().getDestination()).write(msg);
+        }
     }
 
     public void addConnection(String name, Socket socket) throws IOException {
