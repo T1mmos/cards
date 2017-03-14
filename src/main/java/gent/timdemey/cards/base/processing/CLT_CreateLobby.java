@@ -1,6 +1,6 @@
 package gent.timdemey.cards.base.processing;
 
-public class CLT_CreateLobby implements Command {
+public class CLT_CreateLobby extends Command {
     public final String name;
     
     public CLT_CreateLobby (String name){

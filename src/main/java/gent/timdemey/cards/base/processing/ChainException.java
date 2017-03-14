@@ -10,7 +10,7 @@ public class ChainException extends RuntimeException {
         super(msg);
     }
 
-    public static void checkType(List<ALL_GameCommand> cmds, Command last, int at, Class<? extends Command> expected)
+    public static void checkType(List<CLT_GameCommand> cmds, Command last, int at, Class<? extends Command> expected)
             throws ChainException {
 
         if (!expected.isAssignableFrom(cmds.get(at).getClass())) {
@@ -20,7 +20,7 @@ public class ChainException extends RuntimeException {
         }
     }
 
-    public static void checkCount(List<ALL_GameCommand> cmds, Command last, int expected) throws ChainException {
+    public static void checkCount(List<CLT_GameCommand> cmds, Command last, int expected) throws ChainException {
         if (expected != cmds.size()) {
             List<Command> all = new ArrayList<>(cmds);
             all.add(last);
@@ -30,7 +30,7 @@ public class ChainException extends RuntimeException {
         }
     }
 
-    public static void checkNoChaining(List<ALL_GameCommand> cmds, Command last) throws ChainException {
+    public static void checkNoChaining(List<CLT_GameCommand> cmds, Command last) throws ChainException {
         checkCount(cmds, last, 0);
     }
 }

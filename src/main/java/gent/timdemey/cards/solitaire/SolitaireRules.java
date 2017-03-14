@@ -7,7 +7,7 @@ import gent.timdemey.cards.base.beans.B_Pile;
 import gent.timdemey.cards.base.beans.PutDownDef;
 import gent.timdemey.cards.base.beans.TransferDef;
 import gent.timdemey.cards.base.logic.Rules;
-import gent.timdemey.cards.base.processing.ALL_TransferCommand;
+import gent.timdemey.cards.base.processing.CLT_TransferCommand;
 import gent.timdemey.cards.base.processing.CLT_PickUp;
 import gent.timdemey.cards.base.processing.CLT_PutDown;
 import gent.timdemey.cards.base.state.Game;
@@ -107,8 +107,7 @@ public class SolitaireRules implements Rules {
 
     @Override
     public int getMaxPlayers() {
-        // TODO Auto-generated method stub
-        return 0;
+        return 2;
     }
 
     @Override
@@ -124,7 +123,7 @@ public class SolitaireRules implements Rules {
     }
 
     @Override
-    public boolean canAutoTransfer(Game state, ALL_TransferCommand cmd) {
+    public boolean canAutoTransfer(Game state, CLT_TransferCommand cmd) {
         // TODO Auto-generated method stub
         return false;
     }

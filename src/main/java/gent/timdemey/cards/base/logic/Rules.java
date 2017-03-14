@@ -5,7 +5,7 @@ import gent.timdemey.cards.base.processing.CLT_PutDown;
 import gent.timdemey.cards.base.state.Game;
 import gent.timdemey.cards.base.beans.B_Card;
 import gent.timdemey.cards.base.beans.B_Pile;
-import gent.timdemey.cards.base.processing.ALL_TransferCommand;
+import gent.timdemey.cards.base.processing.CLT_TransferCommand;
 
 public interface Rules {
 
@@ -17,7 +17,7 @@ public interface Rules {
 
     public boolean canPutDown(Game state, CLT_PutDown cmd, B_Pile pile);
     
-    public boolean canAutoTransfer(Game state, ALL_TransferCommand cmd);
+    public boolean canAutoTransfer(Game state, CLT_TransferCommand cmd);
     
     
 

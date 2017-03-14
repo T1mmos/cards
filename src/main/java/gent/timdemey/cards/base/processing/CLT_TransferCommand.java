@@ -7,7 +7,7 @@ import gent.timdemey.cards.base.beans.B_PileDef;
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.state.Game;
 
-public class ALL_TransferCommand extends ALL_GameCommand {
+public class CLT_TransferCommand extends CLT_GameCommand {
 
     /**
      * The pile where the cards are currently held in.
@@ -22,7 +22,7 @@ public class ALL_TransferCommand extends ALL_GameCommand {
      */
     public final int howmany;
 
-    public ALL_TransferCommand(B_PileDef from, B_PileDef to, int howmany) {
+    public CLT_TransferCommand(B_PileDef from, B_PileDef to, int howmany) {
         this.from = from;
         this.to = to;
         this.howmany = howmany;
@@ -34,7 +34,7 @@ public class ALL_TransferCommand extends ALL_GameCommand {
     }
 
     @Override
-    protected void execute(List<ALL_GameCommand> prevs, Game state) {
+    protected void execute(List<CLT_GameCommand> prevs, Game state) {
         B_Pile frompile = state.getPile(from);
         B_Pile topile = state.getPile(to);
 
@@ -50,7 +50,7 @@ public class ALL_TransferCommand extends ALL_GameCommand {
     }
 
     @Override
-    protected boolean isAllowed(List<ALL_GameCommand> prevs, Game state, Rules rules) throws ChainException {
+    protected boolean isAllowed(List<CLT_GameCommand> prevs, Game state, Rules rules) throws ChainException {
         ChainException.checkCount(prevs, this, 0);
 
         CLT_PickUp pickup = new CLT_PickUp(from, howmany);
@@ -60,7 +60,7 @@ public class ALL_TransferCommand extends ALL_GameCommand {
     }
 
     @Override
-    protected Command merge(List<ALL_GameCommand> prevs) {
+    protected Command merge(List<CLT_GameCommand> prevs) {
         throw new UnsupportedOperationException();
     }
 }

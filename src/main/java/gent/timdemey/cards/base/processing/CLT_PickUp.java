@@ -14,7 +14,7 @@ import gent.timdemey.cards.base.state.Sorts;
  * 
  *
  */
-public class CLT_PickUp extends ALL_GameCommand {
+public class CLT_PickUp extends CLT_GameCommand {
 
     public final B_PileDef from;
     public final int howmany;
@@ -25,7 +25,7 @@ public class CLT_PickUp extends ALL_GameCommand {
     }
 
     @Override
-    protected void execute(List<ALL_GameCommand> prevs, Game state) {
+    protected void execute(List<CLT_GameCommand> prevs, Game state) {
         B_Pile frompile = state.getPile(from);
         B_Pile topile = state.getPlayer(from.playerId).getPileConfig().getPile(Sorts.DRAG, 0);
         topile.add(frompile.removeTop(howmany));
@@ -39,7 +39,7 @@ public class CLT_PickUp extends ALL_GameCommand {
     }
 
     @Override
-    protected boolean isAllowed(List<ALL_GameCommand> prevs, Game state, Rules rules) throws ChainException {
+    protected boolean isAllowed(List<CLT_GameCommand> prevs, Game state, Rules rules) throws ChainException {
         ChainException.checkCount(prevs, this, 0);
 
         B_Pile frompile = state.getPile(from);
@@ -61,7 +61,7 @@ public class CLT_PickUp extends ALL_GameCommand {
     }
 
     @Override
-    protected Command merge(List<ALL_GameCommand> prevs) {
+    protected Command merge(List<CLT_GameCommand> prevs) {
         return null;
     }
 }

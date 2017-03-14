@@ -30,6 +30,7 @@ public enum Game {
     
     public void setLocalId (String id){
         this.localId = id;
+        System.out.println("Local ID set to: " + id);
     }
     
     public B_GameState getGameState (){

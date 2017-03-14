@@ -1,6 +1,6 @@
 package gent.timdemey.cards.base.processing;
 
-public class SRV_RejectConnect implements Command {
+public class SRV_RejectConnect extends Command {
     public final String msg;
 
     public SRV_RejectConnect(String msg) {

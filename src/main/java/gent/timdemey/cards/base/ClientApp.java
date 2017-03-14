@@ -5,9 +5,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.net.Messenger;
-import gent.timdemey.cards.base.processing.CLT_Connect;
+import gent.timdemey.cards.base.processing.CLT_InitPlayer;
+import gent.timdemey.cards.base.processing.ClientVisitor;
+import gent.timdemey.cards.base.processing.Command;
+import gent.timdemey.cards.base.processing.Processor;
+import gent.timdemey.cards.base.processing.Visitor;
+import gent.timdemey.cards.base.state.Game;
+import gent.timdemey.cards.solitaire.SolitaireRules;
 
 public class ClientApp {
 
@@ -16,8 +21,12 @@ public class ClientApp {
         try {
             s = new Socket(InetAddress.getLocalHost(), 666);
 
-            Messenger m = new Messenger("client", s, ClientApp::handle);
-            m.write(new B_Message("client", new CLT_Connect("client")));
+            Messenger m = new Messenger();
+            m.addConnection("server", s);
+            Processor p = new Processor();
+            Visitor v = new ClientVisitor(p, m, new SolitaireRules());
+            p.addVisitor(v);
+            m.addListener("server", msg -> p.process(msg.getCommand()));
             
             Thread.sleep(5000);
         } catch (UnknownHostException e) {
@@ -31,9 +40,5 @@ public class ClientApp {
             e.printStackTrace();
         }
         
-    }
-    
-    private static void handle(B_Message msg){
-        System.out.println(msg);
     }
 }

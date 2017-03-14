@@ -1,5 +1,8 @@
 package gent.timdemey.cards.base.processing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.net.Messenger;
@@ -7,61 +10,57 @@ import gent.timdemey.cards.base.state.Game;
 
 public class ClientVisitor implements Visitor {
 
+    private final Processor processor;
     private final Messenger messenger;
-    private final Game game;
     private final Rules rules;
+    private final List<CLT_GameCommand> intermediates;
 
-    public ClientVisitor(Game game, Rules rules, Messenger messenger) {
-        this.game = game;
+    public ClientVisitor(Processor p, Messenger m, Rules rules) {
+        this.processor = p;
+        this.messenger = m;
         this.rules = rules;
-        this.messenger = messenger;
+        this.intermediates = new ArrayList<>();
     }
 
     @Override
-    public void visit(ALL_TransferCommand cmd) {
-        // TODO Auto-generated method stub
+    public void visit(CLT_GameCommand cmd) {
+        // this is gonna be a complex method. A game command
+        // may not be allowed in the current state, even when
+        // coming from the server. If this is the case, we are
+        // 100% sure that a rollback is needed because it
+        // indicates that the local state is not synced with the
+        // correct state at server side.
+        // Basically, a game command must always be checked
+        // against the current state, independent of source.
 
-    }
-
-    @Override
-    public void visit(ALL_GameCommand cmd) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void visit(CLT_CreateLobby cmd) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void visit(CLT_Connect cmd) {
-        messenger.write(new B_Message("unknown", cmd));
-    }
-
-    @Override
-    public void visit(SRV_RejectConnect cmd) {
-        // TODO Auto-generated method stub
+        // TODO: implement the entire rollback mechanism.
+        // Use the specific methods for GameCommand.
+        if (cmd.isAllowed(intermediates, Game.INSTANCE, rules)) {
+            cmd.execute(intermediates, Game.INSTANCE);
+        }
 
     }
 
     @Override
     public void visit(SRV_AcceptConnect cmd) {
         Game.INSTANCE.setLocalId(cmd.assigned_id);
-        messenger.write(new B_Message(Game.INSTANCE.getLocalId(), new CLT_RequestLobbyList()));
+        
+
+        Command c = new CLT_InitPlayer("Tim");
+        c.setDestination("server");
+        c.setSource(Game.INSTANCE.getLocalId());
+        processor.process(c);
     }
 
     @Override
     public void visit(CLT_RequestLobbyList cmd) {
-        // TODO Auto-generated method stub
-
+        cmd.setDestination("server");
+        messenger.write(new B_Message(cmd));
     }
 
     @Override
-    public void visit(SRV_ReturnLobbyList cmd) {
-        // TODO Auto-generated method stub
-
+    public void visit(CLT_InitPlayer cmd) {
+        cmd.setDestination("server");
+        messenger.write(new B_Message(cmd));
     }
-
 }

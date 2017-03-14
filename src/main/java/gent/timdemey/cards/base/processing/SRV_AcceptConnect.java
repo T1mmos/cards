@@ -1,7 +1,7 @@
 
 package gent.timdemey.cards.base.processing;
 
-public class SRV_AcceptConnect implements Command {
+public class SRV_AcceptConnect extends Command {
     public final String assigned_id;
 
     public SRV_AcceptConnect(String id) {

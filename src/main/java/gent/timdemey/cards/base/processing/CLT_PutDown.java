@@ -9,7 +9,7 @@ import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.state.Game;
 import gent.timdemey.cards.base.state.Sorts;
 
-public class CLT_PutDown extends ALL_GameCommand {
+public class CLT_PutDown extends CLT_GameCommand {
 
     public final B_PileDef to;
 
@@ -18,14 +18,14 @@ public class CLT_PutDown extends ALL_GameCommand {
     }
 
     @Override
-    protected void execute(List<ALL_GameCommand> prevs, Game state) {
+    protected void execute(List<CLT_GameCommand> prevs, Game state) {
         B_Pile frompile = state.getPlayer(to.playerId).getPileConfig().getPile(Sorts.DRAG, 0);
         B_Pile topile = state.getPile(to);
         topile.add(frompile.remove(0));
     }
 
     @Override
-    protected boolean isAllowed(List<ALL_GameCommand> prevs, Game state, Rules rules) throws ChainException {
+    protected boolean isAllowed(List<CLT_GameCommand> prevs, Game state, Rules rules) throws ChainException {
         ChainException.checkCount(prevs, this, 1);
         ChainException.checkType(prevs, this, 0, CLT_PickUp.class);
 
@@ -39,9 +39,9 @@ public class CLT_PutDown extends ALL_GameCommand {
     }
 
     @Override
-    protected Command merge(List<ALL_GameCommand> prevs) {
+    protected Command merge(List<CLT_GameCommand> prevs) {
         CLT_PickUp pickup = (CLT_PickUp) prevs.get(0);
-        return new ALL_TransferCommand(pickup.from, to, pickup.howmany);
+        return new CLT_TransferCommand(pickup.from, to, pickup.howmany);
     }
 
     @Override
