@@ -10,10 +10,8 @@ public class ServerVisitor implements Visitor {
 
     private final Rules rules;
     private final Messenger messenger;
-    private final Processor processor;
 
-    public ServerVisitor(Processor p, Messenger m, Rules r) {
-        this.processor = p;
+    public ServerVisitor(Messenger m, Rules r) {
         this.messenger = m;
         this.rules = r;
     }
@@ -33,28 +31,28 @@ public class ServerVisitor implements Visitor {
 
     @Override
     public void visit(CLT_RequestGameList cmd) {
-        
+
     }
 
     @Override
     public void visit(CLT_InitPlayer cmd) {
-        Server srv = State.INSTANCE.getServer(cmd.getSource());
+        Server srv = State.INSTANCE.getServer(cmd.getDestination());
         srv.getPlayers().stream().forEach(p -> {
-            Command ret = new SRV_InitPlayer(p.getId(), p.getName());
-            ret.setSource("server");
+            Command ret = new SRV_AddPlayer(p.getId(), p.getName());
+            ret.setSource(srv.getLocalId());
             ret.setDestination(cmd.getSource());
-            processor.process(ret);
+            Processor.INSTANCE.process(ret);
         });
 
         srv.addPlayer(cmd.getSource(), cmd.name);
-        Command ret = new SRV_InitPlayer(cmd.getSource(), cmd.name);
-        ret.setSource("server");
+        Command ret = new SRV_AddPlayer(cmd.getSource(), cmd.name);
+        ret.setSource(srv.getLocalId());
         ret.setDestination("broadcast");
-        processor.process(ret);
+        Processor.INSTANCE.process(ret);
     }
 
     @Override
-    public void visit(SRV_InitPlayer cmd) {
+    public void visit(SRV_AddPlayer cmd) {
         messenger.write(new B_Message(cmd));
     }
 

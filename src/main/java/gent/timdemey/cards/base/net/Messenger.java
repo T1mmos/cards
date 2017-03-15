@@ -1,27 +1,10 @@
 package gent.timdemey.cards.base.net;
 
 import java.io.IOException;
-import java.net.Socket;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
-
 import gent.timdemey.cards.base.beans.B_Message;
-import gent.timdemey.cards.base.processing.CLT_AbortPickUp;
-import gent.timdemey.cards.base.processing.CLT_InitPlayer;
-import gent.timdemey.cards.base.processing.CLT_PickUp;
-import gent.timdemey.cards.base.processing.CLT_PutDown;
-import gent.timdemey.cards.base.processing.CLT_RequestGameList;
-import gent.timdemey.cards.base.processing.CLT_TransferCommand;
-import gent.timdemey.cards.base.processing.Command;
-import gent.timdemey.cards.base.processing.SRV_AcceptConnect;
-import gent.timdemey.cards.base.processing.SRV_InitPlayer;
-import gent.timdemey.cards.base.processing.SRV_RemovePlayer;
 
 public class Messenger {
 

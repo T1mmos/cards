@@ -5,13 +5,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import gent.timdemey.cards.base.state.Game;
+public enum Processor {
 
-public final class Processor {
-
+    INSTANCE;
+    
     private final List<Visitor> visitors;
 
-    public Processor() {
+    private Processor() {
         this.visitors = new ArrayList<>();
     }
     
@@ -20,6 +20,7 @@ public final class Processor {
     }
 
     public void process(Command command) {
+        System.out.println(command);
         checkNotNull(command.getSource());
         checkNotNull(command.getDestination());
         visitors.stream().forEach(command::accept);

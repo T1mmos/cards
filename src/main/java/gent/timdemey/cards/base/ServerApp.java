@@ -21,12 +21,12 @@ public class ServerApp {
     public static void main(String[] args) {
         try (ServerSocket ssocket = new ServerSocket(666)) {
             Messenger m = new Messenger();
-            Processor p = new Processor();
-            Visitor v = new ServerVisitor(p, m, new SolitaireRules());
-            p.addVisitor(v);
+            Visitor v = new ServerVisitor(m, new SolitaireRules());
+            Processor.INSTANCE.addVisitor(v);
 
-            String id = "SRV-" + StringUtils.getRandomString(32);
+            String id = "SRV-" + StringUtils.getRandomString(4);
             final Server server = new Server(id, id);
+            State.INSTANCE.addServer(server);
 
             while (true) {
                 Socket csocket = ssocket.accept();
@@ -34,7 +34,7 @@ public class ServerApp {
                 // unique id
                 String unique_id = null;
                 do {
-                    unique_id = StringUtils.getRandomString(16);
+                    unique_id = StringUtils.getRandomString(8);
                 } while (server.isPlayer(unique_id));
 
                 // set up connection
@@ -43,13 +43,13 @@ public class ServerApp {
                     conn.setName(unique_id);
 
                     conn.addMessageListener(msg -> {
-                        p.process(msg.getCommand());
+                        Processor.INSTANCE.process(msg.getCommand());
                     });
                     conn.addConnectionListener(c -> {
                         Command cmd = new SRV_RemovePlayer(c.getName());
                         cmd.setSource(server.getLocalId());
                         cmd.setDestination("broadcast");
-                        p.process(cmd);
+                        Processor.INSTANCE.process(cmd);
                     });
                     m.addNewConnection(conn);
                     m.setNewConnectionId(unique_id);
@@ -61,7 +61,7 @@ public class ServerApp {
                     Command c = new SRV_AcceptConnect(server.getLocalId(), unique_id);
                     c.setSource(server.getLocalId());
                     c.setDestination(unique_id);
-                    p.process(c);
+                    Processor.INSTANCE.process(c);
                 }
 
             }

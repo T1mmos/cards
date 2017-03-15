@@ -1,8 +1,6 @@
 package gent.timdemey.cards.base.processing;
 
 import gent.timdemey.cards.base.beans.BeanUtils;
-import gent.timdemey.cards.base.logic.Rules;
-import gent.timdemey.cards.base.net.Messenger;
 
 /**
  * A command is an atomic piece that unconditionally executes a specific step,
@@ -34,6 +32,6 @@ public abstract class Command {
      
     @Override
     public String toString() {
-        return BeanUtils.pretty(this);
+        return getClass().getSimpleName() + " :: " + BeanUtils.small(this);
     }
 }

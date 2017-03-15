@@ -11,13 +11,11 @@ import gent.timdemey.cards.base.state.State;
 
 public class ClientVisitor implements Visitor {
 
-    private final Processor processor;
     private final Messenger messenger;
     private final Rules rules;
     private final List<CLT_GameCommand> intermediates;
 
-    public ClientVisitor(Processor p, Messenger m, Rules rules) {
-        this.processor = p;
+    public ClientVisitor(Messenger m, Rules rules) {
         this.messenger = m;
         this.rules = rules;
         this.intermediates = new ArrayList<>();
@@ -36,9 +34,9 @@ public class ClientVisitor implements Visitor {
 
         // TODO: implement the entire rollback mechanism.
         // Use the specific methods for GameCommand.
-        //if (cmd.isAllowed(intermediates, Game.INSTANCE, rules)) {
-        //    cmd.execute(intermediates, Game.INSTANCE);
-        //}
+        // if (cmd.isAllowed(intermediates, Game.INSTANCE, rules)) {
+        // cmd.execute(intermediates, Game.INSTANCE);
+        // }
 
     }
 
@@ -50,19 +48,17 @@ public class ClientVisitor implements Visitor {
 
     @Override
     public void visit(CLT_RequestGameList cmd) {
-        cmd.setDestination("server");
         messenger.write(new B_Message(cmd));
     }
 
     @Override
     public void visit(CLT_InitPlayer cmd) {
-        cmd.setDestination("server");
         messenger.write(new B_Message(cmd));
     }
 
     @Override
-    public void visit(SRV_InitPlayer cmd) {
-        State.INSTANCE.getServer(cmd.getSource()).getPlayer(cmd.id).setName(cmd.name);
+    public void visit(SRV_AddPlayer cmd) {
+        State.INSTANCE.getServer(cmd.getSource()).addPlayer(cmd.id, cmd.name);
     }
 
     @Override

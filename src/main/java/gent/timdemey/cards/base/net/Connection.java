@@ -27,7 +27,7 @@ import gent.timdemey.cards.base.processing.CLT_RequestGameList;
 import gent.timdemey.cards.base.processing.CLT_TransferCommand;
 import gent.timdemey.cards.base.processing.Command;
 import gent.timdemey.cards.base.processing.SRV_AcceptConnect;
-import gent.timdemey.cards.base.processing.SRV_InitPlayer;
+import gent.timdemey.cards.base.processing.SRV_AddPlayer;
 import gent.timdemey.cards.base.processing.SRV_RemovePlayer;
 
 public class Connection {
@@ -46,7 +46,7 @@ public class Connection {
             SRV_AcceptConnect.class,
             CLT_RequestGameList.class,
             CLT_InitPlayer.class,
-            SRV_InitPlayer.class,
+            SRV_AddPlayer.class,
             SRV_RemovePlayer.class
         );
         //@formatter:on      
