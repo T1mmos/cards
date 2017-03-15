@@ -2,16 +2,16 @@ package gent.timdemey.cards.base.processing;
 
 import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.logic.Rules;
-import gent.timdemey.cards.base.net.Messenger;
+import gent.timdemey.cards.base.net.ConnectionManager;
 import gent.timdemey.cards.base.state.Server;
 import gent.timdemey.cards.base.state.State;
 
 public class ServerVisitor implements Visitor {
 
     private final Rules rules;
-    private final Messenger messenger;
+    private final ConnectionManager messenger;
 
-    public ServerVisitor(Messenger m, Rules r) {
+    public ServerVisitor(ConnectionManager m, Rules r) {
         this.messenger = m;
         this.rules = r;
     }
@@ -25,7 +25,7 @@ public class ServerVisitor implements Visitor {
     public void visit(SRV_AcceptConnect cmd) {
         String assigned_id = cmd.assigned_id;
 
-        cmd.setDestination(assigned_id);
+        cmd.setDestinationID(assigned_id);
         messenger.write(new B_Message(cmd));
     }
 
@@ -36,18 +36,18 @@ public class ServerVisitor implements Visitor {
 
     @Override
     public void visit(CLT_InitPlayer cmd) {
-        Server srv = State.INSTANCE.getServer(cmd.getDestination());
+        Server srv = State.INSTANCE.getServer(cmd.getDestinationID());
         srv.getPlayers().stream().forEach(p -> {
             Command ret = new SRV_AddPlayer(p.getId(), p.getName());
-            ret.setSource(srv.getLocalId());
-            ret.setDestination(cmd.getSource());
+            ret.setSourceID(srv.getLocalId());
+            ret.setDestinationID(cmd.getSourceID());
             Processor.INSTANCE.process(ret);
         });
 
-        srv.addPlayer(cmd.getSource(), cmd.name);
-        Command ret = new SRV_AddPlayer(cmd.getSource(), cmd.name);
-        ret.setSource(srv.getLocalId());
-        ret.setDestination("broadcast");
+        srv.addPlayer(cmd.getSourceID(), cmd.name);
+        Command ret = new SRV_AddPlayer(cmd.getSourceID(), cmd.name);
+        ret.setSourceID(srv.getLocalId());
+        ret.setDestinationID("broadcast");
         Processor.INSTANCE.process(ret);
     }
 
@@ -58,7 +58,7 @@ public class ServerVisitor implements Visitor {
 
     @Override
     public void visit(SRV_RemovePlayer cmd) {
-        State.INSTANCE.getServer(cmd.getSource()).removePlayer(cmd.id);
+        State.INSTANCE.getServer(cmd.getSourceID()).removePlayer(cmd.id);
         messenger.write(new B_Message(cmd));
     }
 }

@@ -10,6 +10,7 @@ public class B_Message {
         this.command = command;
     }
 
+
     public Command getCommand() {
         return command;
     }

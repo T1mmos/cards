@@ -58,12 +58,13 @@ public class Connection {
     private final Set<MessageListener> msgListeners;
     private final Set<ConnectionListener> connListeners;
     private final InetAddress inetAddr;
+    private final int port;
 
     private Writer writer;
     private BufferedReader reader;
     private Thread readThr = null;
     private Socket socket;
-    private String name = null;
+    private String id = "BOOTING";
 
     public Connection(Socket socket) throws IOException {
         this.socket = socket;
@@ -72,14 +73,15 @@ public class Connection {
         this.connListeners = ConcurrentHashMap.newKeySet();
         this.msgListeners = ConcurrentHashMap.newKeySet();
         this.inetAddr = socket.getInetAddress();
+        this.port = socket.getPort();
         this.readThr = new Thread(() -> listen(), toString());
     }
 
-    public void setName (String name){
-        this.name = checkNotNull(name);
+    public void setId(String name) {
+        this.id = checkNotNull(name);
         this.readThr.setName(toString());
     }
-    
+
     public void start() {
         readThr.start();
     }
@@ -113,8 +115,8 @@ public class Connection {
     public void addMessageListener(MessageListener listener) {
         msgListeners.add(listener);
     }
-    
-    public void removeMessageListeners (){
+
+    public void removeMessageListeners() {
         msgListeners.clear();
     }
 
@@ -131,20 +133,24 @@ public class Connection {
                 }
                 String line = reader.readLine();
                 B_Message msg = gson.fromJson(line, B_Message.class);
+                msg.getCommand().setSourceIP(socket.getInetAddress());
+                msg.getCommand().setSourcePort(socket.getPort());
+
                 msgListeners.stream().forEach(l -> l.onReceive(msg));
             }
         } catch (IOException e) {
+            e.printStackTrace();
             socket = null;
             readThr = null;
             try {
                 reader.close();
             } catch (IOException e2) {
-                System.out.println("Failed to close reader for connection to: " + name);
+                System.out.println("Failed to close reader for connection to: " + id);
             }
             try {
                 writer.close();
             } catch (IOException e2) {
-                System.out.println("Failed to close writer for connection to: " + name);
+                System.out.println("Failed to close writer for connection to: " + id);
             }
         } finally {
             connListeners.forEach(c -> c.onConnectionLost(this));
@@ -155,10 +161,14 @@ public class Connection {
         return inetAddr;
     }
 
-    public String getName() {
-        return name;
+    public int getPort() {
+        return port;
     }
-    
+
+    public String getName() {
+        return id;
+    }
+
     @Override
     public String toString() {
         return "Connection @ " + getName();

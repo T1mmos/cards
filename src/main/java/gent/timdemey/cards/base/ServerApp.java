@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import gent.timdemey.cards.base.net.Connection;
-import gent.timdemey.cards.base.net.Messenger;
+import gent.timdemey.cards.base.net.ConnectionManager;
 import gent.timdemey.cards.base.processing.Command;
 import gent.timdemey.cards.base.processing.Processor;
 import gent.timdemey.cards.base.processing.SRV_AcceptConnect;
@@ -20,7 +20,7 @@ import gent.timdemey.cards.solitaire.SolitaireRules;
 public class ServerApp {
     public static void main(String[] args) {
         try (ServerSocket ssocket = new ServerSocket(666)) {
-            Messenger m = new Messenger();
+            ConnectionManager m = new ConnectionManager();
             Visitor v = new ServerVisitor(m, new SolitaireRules());
             Processor.INSTANCE.addVisitor(v);
 
@@ -34,33 +34,33 @@ public class ServerApp {
                 // unique id
                 String unique_id = null;
                 do {
-                    unique_id = StringUtils.getRandomString(8);
+                    unique_id = "CLT-" + StringUtils.getRandomString(4);
                 } while (server.isPlayer(unique_id));
 
                 // set up connection
                 {
                     Connection conn = new Connection(csocket);
-                    conn.setName(unique_id);
+                    conn.setId(unique_id);
 
                     conn.addMessageListener(msg -> {
                         Processor.INSTANCE.process(msg.getCommand());
                     });
                     conn.addConnectionListener(c -> {
                         Command cmd = new SRV_RemovePlayer(c.getName());
-                        cmd.setSource(server.getLocalId());
-                        cmd.setDestination("broadcast");
+                        cmd.setSourceID(server.getLocalId());
+                        cmd.setDestinationID("broadcast");
                         Processor.INSTANCE.process(cmd);
                     });
-                    m.addNewConnection(conn);
-                    m.setNewConnectionId(unique_id);
+                    m.addBootingConnection(conn);
+                    m.establishConnection(conn.getInetAddress(), conn.getPort(), unique_id);
                     conn.start();
                 }
                 
                 // send acknowledgement
                 {
                     Command c = new SRV_AcceptConnect(server.getLocalId(), unique_id);
-                    c.setSource(server.getLocalId());
-                    c.setDestination(unique_id);
+                    c.setSourceID(id);
+                    c.setDestinationID(unique_id);
                     Processor.INSTANCE.process(c);
                 }
 

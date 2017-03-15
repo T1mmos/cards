@@ -5,17 +5,17 @@ import java.util.List;
 
 import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.logic.Rules;
-import gent.timdemey.cards.base.net.Messenger;
+import gent.timdemey.cards.base.net.ConnectionManager;
 import gent.timdemey.cards.base.state.Server;
 import gent.timdemey.cards.base.state.State;
 
 public class ClientVisitor implements Visitor {
 
-    private final Messenger messenger;
+    private final ConnectionManager messenger;
     private final Rules rules;
     private final List<CLT_GameCommand> intermediates;
 
-    public ClientVisitor(Messenger m, Rules rules) {
+    public ClientVisitor(ConnectionManager m, Rules rules) {
         this.messenger = m;
         this.rules = rules;
         this.intermediates = new ArrayList<>();
@@ -42,13 +42,13 @@ public class ClientVisitor implements Visitor {
 
     @Override
     public void visit(SRV_AcceptConnect cmd) {
-        messenger.setNewConnectionId(cmd.server_id);
-        State.INSTANCE.addServer(new Server(cmd.getSource(), cmd.assigned_id));
+        messenger.establishConnection(cmd.getSourceIP(), cmd.getSourcePort(), cmd.server_id);
+        State.INSTANCE.addServer(new Server(cmd.server_id, cmd.assigned_id));
     }
 
     @Override
     public void visit(CLT_RequestGameList cmd) {
-        messenger.write(new B_Message(cmd));
+        //messenger.write(new B_Message(cmd));
     }
 
     @Override
@@ -58,11 +58,11 @@ public class ClientVisitor implements Visitor {
 
     @Override
     public void visit(SRV_AddPlayer cmd) {
-        State.INSTANCE.getServer(cmd.getSource()).addPlayer(cmd.id, cmd.name);
+        State.INSTANCE.getServer(cmd.getSourceID()).addPlayer(cmd.id, cmd.name);
     }
 
     @Override
     public void visit(SRV_RemovePlayer cmd) {
-        State.INSTANCE.getServer(cmd.getSource()).removePlayer(cmd.id);
+        State.INSTANCE.getServer(cmd.getSourceID()).removePlayer(cmd.id);
     }
 }
