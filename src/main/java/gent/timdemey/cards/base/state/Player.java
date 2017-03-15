@@ -32,12 +32,12 @@ public class Player {
 
     public void setName(String name) {
         this.name = name;
-        lstrs.stream().forEach(l -> l.nameChanged(this));
+        lstrs.stream().forEach(l -> l.onNameChanged(this));
     }
 
     public void setPileConfig(B_PileConfig cfg) {
         this.pilecfg = cfg;
-        lstrs.stream().forEach(l -> l.pileConfigChanged(this));
+        lstrs.stream().forEach(l -> l.onPileConfigChanged(this));
     }
 
     public B_PileConfig getPileConfig() {

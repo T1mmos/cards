@@ -1,12 +1,10 @@
 package gent.timdemey.cards.base.processing;
 
-import java.util.List;
-
 import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.net.Messenger;
-import gent.timdemey.cards.base.state.Game;
-import gent.timdemey.cards.base.state.Player;
+import gent.timdemey.cards.base.state.Server;
+import gent.timdemey.cards.base.state.State;
 
 public class ServerVisitor implements Visitor {
 
@@ -34,27 +32,25 @@ public class ServerVisitor implements Visitor {
     }
 
     @Override
-    public void visit(CLT_RequestLobbyList cmd) {
-        System.out.println("Lobby list requested by: " + cmd.getSource() + " ("
-                + Game.INSTANCE.getPlayer(cmd.getSource()).getName() + ")");
+    public void visit(CLT_RequestGameList cmd) {
+        
     }
 
     @Override
     public void visit(CLT_InitPlayer cmd) {
-        Game.INSTANCE.getPlayers().stream().forEach(p -> {
+        Server srv = State.INSTANCE.getServer(cmd.getSource());
+        srv.getPlayers().stream().forEach(p -> {
             Command ret = new SRV_InitPlayer(p.getId(), p.getName());
             ret.setSource("server");
             ret.setDestination(cmd.getSource());
             processor.process(ret);
         });
 
-        Game.INSTANCE.addPlayer(cmd.getSource(), cmd.name);
+        srv.addPlayer(cmd.getSource(), cmd.name);
         Command ret = new SRV_InitPlayer(cmd.getSource(), cmd.name);
         ret.setSource("server");
         ret.setDestination("broadcast");
         processor.process(ret);
-
-        System.out.println("Client " + cmd.name + " connected from " + messenger.getConnection(cmd.getSource()).getInetAddress());
     }
 
     @Override
@@ -64,9 +60,7 @@ public class ServerVisitor implements Visitor {
 
     @Override
     public void visit(SRV_RemovePlayer cmd) {
-        Player p = Game.INSTANCE.getPlayer(cmd.id);
-        Game.INSTANCE.removePlayer(cmd.id);
+        State.INSTANCE.getServer(cmd.getSource()).removePlayer(cmd.id);
         messenger.write(new B_Message(cmd));
-        System.out.println("Dropped client " + p);
     }
 }

@@ -25,9 +25,9 @@ public class CLT_PickUp extends CLT_GameCommand {
     }
 
     @Override
-    protected void execute(List<CLT_GameCommand> prevs, Game state) {
-        B_Pile frompile = state.getPile(from);
-        B_Pile topile = state.getPlayer(from.playerId).getPileConfig().getPile(Sorts.DRAG, 0);
+    protected void execute(List<CLT_GameCommand> prevs, Game game) {
+        B_Pile frompile = game.getPile(from);
+        B_Pile topile = game.getPlayer(from.playerId).getPileConfig().getPile(Sorts.DRAG, 0);
         topile.add(frompile.removeTop(howmany));
     }
 
@@ -39,15 +39,15 @@ public class CLT_PickUp extends CLT_GameCommand {
     }
 
     @Override
-    protected boolean isAllowed(List<CLT_GameCommand> prevs, Game state, Rules rules) throws ChainException {
+    protected boolean isAllowed(List<CLT_GameCommand> prevs, Game game, Rules rules) throws ChainException {
         ChainException.checkCount(prevs, this, 0);
 
-        B_Pile frompile = state.getPile(from);
+        B_Pile frompile = game.getPile(from);
         if (howmany > frompile.size()) {
             return false;
         }
 
-        return rules.canPickUp(state, this);
+        return rules.canPickUp(game, this);
     }
 
     @Override

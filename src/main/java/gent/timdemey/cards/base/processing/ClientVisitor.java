@@ -6,7 +6,8 @@ import java.util.List;
 import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.logic.Rules;
 import gent.timdemey.cards.base.net.Messenger;
-import gent.timdemey.cards.base.state.Game;
+import gent.timdemey.cards.base.state.Server;
+import gent.timdemey.cards.base.state.State;
 
 public class ClientVisitor implements Visitor {
 
@@ -35,19 +36,20 @@ public class ClientVisitor implements Visitor {
 
         // TODO: implement the entire rollback mechanism.
         // Use the specific methods for GameCommand.
-        if (cmd.isAllowed(intermediates, Game.INSTANCE, rules)) {
-            cmd.execute(intermediates, Game.INSTANCE);
-        }
+        //if (cmd.isAllowed(intermediates, Game.INSTANCE, rules)) {
+        //    cmd.execute(intermediates, Game.INSTANCE);
+        //}
 
     }
 
     @Override
     public void visit(SRV_AcceptConnect cmd) {
-        Game.INSTANCE.setLocalId(cmd.assigned_id);
+        messenger.setNewConnectionId(cmd.server_id);
+        State.INSTANCE.addServer(new Server(cmd.getSource(), cmd.assigned_id));
     }
 
     @Override
-    public void visit(CLT_RequestLobbyList cmd) {
+    public void visit(CLT_RequestGameList cmd) {
         cmd.setDestination("server");
         messenger.write(new B_Message(cmd));
     }
@@ -60,11 +62,11 @@ public class ClientVisitor implements Visitor {
 
     @Override
     public void visit(SRV_InitPlayer cmd) {
-        Game.INSTANCE.addPlayer(cmd.id, cmd.name);
+        State.INSTANCE.getServer(cmd.getSource()).getPlayer(cmd.id).setName(cmd.name);
     }
 
     @Override
     public void visit(SRV_RemovePlayer cmd) {
-        Game.INSTANCE.removePlayer(cmd.id);
+        State.INSTANCE.getServer(cmd.getSource()).removePlayer(cmd.id);
     }
 }

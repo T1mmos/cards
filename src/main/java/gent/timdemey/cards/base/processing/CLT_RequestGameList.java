@@ -1,6 +1,6 @@
 package gent.timdemey.cards.base.processing;
 
-public class CLT_RequestLobbyList extends Command {
+public class CLT_RequestGameList extends Command {
 
     @Override
     public void accept(Visitor visitor) {
