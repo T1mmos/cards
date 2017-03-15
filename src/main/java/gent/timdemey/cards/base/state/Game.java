@@ -13,7 +13,7 @@ import gent.timdemey.cards.base.state.listeners.GameListener;
 public enum Game {
 
     INSTANCE;
-    
+
     private B_GameState state;
     private final List<Lobby> lobbies;
     private final List<Player> players;
@@ -26,63 +26,62 @@ public enum Game {
         this.lobbies = new ArrayList<>();
         this.listeners = new ArrayList<>();
     }
-    
-    public String getLocalId (){
+
+    public String getLocalId() {
         return localId;
     }
-    
-    public void setLocalId (String id){
+
+    public void setLocalId(String id) {
         this.localId = id;
         listeners.forEach(l -> l.idAssigned(localId));
     }
-    
-    public B_GameState getGameState (){
+
+    public B_GameState getGameState() {
         return state;
     }
-    
-    public void setGameState (B_GameState state){
+
+    public void setGameState(B_GameState state) {
         this.state = state;
     }
-    
-    public void addLobby (Lobby lobby){
+
+    public void addLobby(Lobby lobby) {
         lobbies.add(lobby);
     }
-    
-    public List<Lobby> getLobbies (){
+
+    public List<Lobby> getLobbies() {
         return lobbies;
     }
-    
-    public void removeLobby (Lobby lobby){
+
+    public void removeLobby(Lobby lobby) {
         lobbies.remove(lobby);
     }
-    
-    public void addPlayer (String id, String name){
+
+    public void addPlayer(String id, String name) {
         Player player = new Player(id, name);
         players.add(player);
         listeners.forEach(l -> l.playerAdded(player));
     }
-    
-    public void addListener (GameListener listener ){
+
+    public void addListener(GameListener listener) {
         listeners.add(listener);
     }
-    
+
     public Player getPlayer(String id) {
         return players.stream().filter(player -> player.getId().equals(id)).collect(Collectors.toList()).get(0);
     }
-    
-    public List<Player> getPlayers(){
+
+    public List<Player> getPlayers() {
         return players;
     }
 
-    public int getPlayerCount (){
+    public int getPlayerCount() {
         return players.size();
     }
-    
-    public void removePlayer(String id){
+
+    public void removePlayer(String id) {
         players.removeIf(p -> p.getId().equals(id));
-        System.out.println("Removed player: " + id);
     }
-    
+
     public Player getLocalPlayer() {
         return getPlayer(localId);
     }
@@ -91,7 +90,7 @@ public enum Game {
         return getLocalPlayer().getId().equals(id);
     }
 
-    public boolean isPlayer (String id){
+    public boolean isPlayer(String id) {
         return players.stream().filter(p -> p.getId().equals(id)).collect(Collectors.toList()).size() != 0;
     }
 

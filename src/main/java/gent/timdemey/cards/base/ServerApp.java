@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import gent.timdemey.cards.base.beans.B_Message;
-import gent.timdemey.cards.base.net.MessageListener;
 import gent.timdemey.cards.base.net.Messenger;
 import gent.timdemey.cards.base.processing.Command;
 import gent.timdemey.cards.base.processing.Processor;
@@ -34,12 +32,13 @@ public class ServerApp {
 
                 m.addConnection(unique_id, csocket);
                 m.addMessageListener(unique_id, msg -> p.process(msg.getCommand()));
-                m.addConnectionListener(unique_id, id -> {
-                    Command cmd = new SRV_RemovePlayer(id);
+                m.addConnectionListener(unique_id, conn -> {
+                    Command cmd = new SRV_RemovePlayer(conn.getId());
                     cmd.setSource("server");
                     cmd.setDestination("broadcast");
                     p.process(cmd);
                 });
+                m.startConnection(unique_id);
 
                 Command c = new SRV_AcceptConnect(unique_id);
                 c.setSource("server");

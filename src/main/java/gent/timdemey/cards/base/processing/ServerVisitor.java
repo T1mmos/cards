@@ -53,6 +53,8 @@ public class ServerVisitor implements Visitor {
         ret.setSource("server");
         ret.setDestination("broadcast");
         processor.process(ret);
+
+        System.out.println("Client " + cmd.name + " connected from " + messenger.getConnection(cmd.getSource()).getInetAddress());
     }
 
     @Override
@@ -62,7 +64,9 @@ public class ServerVisitor implements Visitor {
 
     @Override
     public void visit(SRV_RemovePlayer cmd) {
+        Player p = Game.INSTANCE.getPlayer(cmd.id);
         Game.INSTANCE.removePlayer(cmd.id);
         messenger.write(new B_Message(cmd));
+        System.out.println("Dropped client " + p);
     }
 }

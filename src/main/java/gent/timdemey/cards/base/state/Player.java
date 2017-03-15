@@ -11,7 +11,7 @@ public class Player {
 
     private final transient List<PlayerListener> lstrs;
     private transient int pDone = 0;
-    private B_PileConfig pilecfg = null;
+    private transient B_PileConfig pilecfg = null;
 
     private final String id;
     private String name;

@@ -19,7 +19,7 @@ import gent.timdemey.cards.solitaire.SolitaireRules;
 public class ClientApp implements GameListener {
 
     private final Processor p = new Processor();
-    
+
     public static void main(String[] args) {
         ClientApp app = new ClientApp();
         Game.INSTANCE.addListener(app);
@@ -28,17 +28,18 @@ public class ClientApp implements GameListener {
     }
 
     private void start() {
-        
+
         Socket s;
         try {
             s = new Socket(InetAddress.getLocalHost(), 666);
 
             Messenger m = new Messenger();
             m.addConnection("server", s);
+            m.addMessageListener("server", msg -> p.process(msg.getCommand()));
+            m.startConnection("server");
 
             Visitor v = new ClientVisitor(p, m, new SolitaireRules());
             p.addVisitor(v);
-            m.addMessageListener("server", msg -> p.process(msg.getCommand()));
 
             Thread.sleep(5000);
         } catch (UnknownHostException e) {
@@ -66,7 +67,6 @@ public class ClientApp implements GameListener {
     @Override
     public void idAssigned(String id) {
         System.out.println("Got assigned ID " + id);
-        
         Command c = new CLT_InitPlayer("Tim");
         c.setDestination("server");
         c.setSource(Game.INSTANCE.getLocalId());
