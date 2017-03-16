@@ -18,7 +18,6 @@ public enum Processor {
     }
 
     public void process(Command command) {
-        System.out.println(command);
         visitors.stream().forEach(command::accept);
     }
 }

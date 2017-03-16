@@ -9,10 +9,8 @@ import gent.timdemey.cards.base.state.State;
 public class ServerVisitor implements Visitor {
 
     private final Rules rules;
-    private final ConnectionManager messenger;
 
-    public ServerVisitor(ConnectionManager m, Rules r) {
-        this.messenger = m;
+    public ServerVisitor(Rules r) {
         this.rules = r;
     }
 
@@ -23,10 +21,7 @@ public class ServerVisitor implements Visitor {
 
     @Override
     public void visit(SRV_AcceptConnect cmd) {
-        String assigned_id = cmd.assigned_id;
-
-        cmd.setDestinationID(assigned_id);
-        messenger.write(new B_Message(cmd));
+        ConnectionManager.write(new B_Message(cmd));
     }
 
     @Override
@@ -38,27 +33,21 @@ public class ServerVisitor implements Visitor {
     public void visit(CLT_InitPlayer cmd) {
         Server srv = State.INSTANCE.getServer(cmd.getDestinationID());
         srv.getPlayers().stream().forEach(p -> {
-            Command ret = new SRV_AddPlayer(p.getId(), p.getName());
-            ret.setSourceID(srv.getLocalId());
-            ret.setDestinationID(cmd.getSourceID());
-            Processor.INSTANCE.process(ret);
+            new SRV_AddPlayer(p.getId(), p.getName()).setSourceID(srv.getLocalId()).unicast(cmd.getSourceID());
         });
 
         srv.addPlayer(cmd.getSourceID(), cmd.name);
-        Command ret = new SRV_AddPlayer(cmd.getSourceID(), cmd.name);
-        ret.setSourceID(srv.getLocalId());
-        ret.setDestinationID("broadcast");
-        Processor.INSTANCE.process(ret);
+        new SRV_AddPlayer(cmd.getSourceID(), cmd.name).setSourceID(srv.getLocalId()).broadcast();
     }
 
     @Override
     public void visit(SRV_AddPlayer cmd) {
-        messenger.write(new B_Message(cmd));
+        ConnectionManager.write(new B_Message(cmd));
     }
 
     @Override
     public void visit(SRV_RemovePlayer cmd) {
         State.INSTANCE.getServer(cmd.getSourceID()).removePlayer(cmd.id);
-        messenger.write(new B_Message(cmd));
+        ConnectionManager.write(new B_Message(cmd));
     }
 }

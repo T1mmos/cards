@@ -64,9 +64,9 @@ public class Connection {
     private BufferedReader reader;
     private Thread readThr = null;
     private Socket socket;
-    private String id = "BOOTING";
+    private String id;
 
-    public Connection(Socket socket) throws IOException {
+    Connection(Socket socket, String initial_id) throws IOException {
         this.socket = socket;
         this.writer = new PrintWriter(socket.getOutputStream());
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -77,16 +77,24 @@ public class Connection {
         this.readThr = new Thread(() -> listen(), toString());
     }
 
-    public void setId(String name) {
-        this.id = checkNotNull(name);
+    void setId(String id) {
+        this.id = checkNotNull(id);
         this.readThr.setName(toString());
     }
 
     public void start() {
-        readThr.start();
+        ConnectionManager.startConnection(this);
     }
 
-    public void stop() {
+    public void stop (){
+        ConnectionManager.destroyConnection(this);
+    }
+    
+    void startImpl(){
+        readThr.start();
+    }
+    
+    void stopImpl() {
         readThr.interrupt();
         try {
             socket.close();
@@ -124,7 +132,7 @@ public class Connection {
         connListeners.add(listener);
     }
 
-    private void listen() {
+    void listen() {
         try {
             while (true) {
                 if (Thread.interrupted()) {
@@ -165,12 +173,12 @@ public class Connection {
         return port;
     }
 
-    public String getName() {
+    public String getId() {
         return id;
     }
 
     @Override
     public String toString() {
-        return "Connection @ " + getName();
+        return "Connection @ " + getId();
     }
 }

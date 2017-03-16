@@ -20,12 +20,11 @@ import gent.timdemey.cards.solitaire.SolitaireRules;
 public class ServerApp {
     public static void main(String[] args) {
         try (ServerSocket ssocket = new ServerSocket(666)) {
-            ConnectionManager m = new ConnectionManager();
-            Visitor v = new ServerVisitor(m, new SolitaireRules());
+            Visitor v = new ServerVisitor(new SolitaireRules());
             Processor.INSTANCE.addVisitor(v);
 
             String id = "SRV-" + StringUtils.getRandomString(4);
-            final Server server = new Server(id, id);
+            final Server server = new Server(id, id, "My Awesome Card Server!");
             State.INSTANCE.addServer(server);
 
             while (true) {
@@ -39,31 +38,21 @@ public class ServerApp {
 
                 // set up connection
                 {
-                    Connection conn = new Connection(csocket);
-                    conn.setId(unique_id);
+                    Connection conn = ConnectionManager.newEstablishedConnection(csocket, unique_id);
 
                     conn.addMessageListener(msg -> {
                         Processor.INSTANCE.process(msg.getCommand());
                     });
                     conn.addConnectionListener(c -> {
-                        Command cmd = new SRV_RemovePlayer(c.getName());
-                        cmd.setSourceID(server.getLocalId());
-                        cmd.setDestinationID("broadcast");
-                        Processor.INSTANCE.process(cmd);
+                        new SRV_RemovePlayer(c.getId()).setSourceID(server.getLocalId()).broadcast();
                     });
-                    m.addBootingConnection(conn);
-                    m.establishConnection(conn.getInetAddress(), conn.getPort(), unique_id);
-                    conn.start();
-                }
-                
-                // send acknowledgement
-                {
-                    Command c = new SRV_AcceptConnect(server.getLocalId(), unique_id);
-                    c.setSourceID(id);
-                    c.setDestinationID(unique_id);
-                    Processor.INSTANCE.process(c);
                 }
 
+                // send acknowledgement
+                {
+                    new SRV_AcceptConnect(server.getLocalId(), unique_id, server.getName()).setSourceID(id)
+                            .unicast(unique_id);
+                }
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block

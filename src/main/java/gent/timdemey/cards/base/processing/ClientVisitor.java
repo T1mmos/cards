@@ -11,12 +11,10 @@ import gent.timdemey.cards.base.state.State;
 
 public class ClientVisitor implements Visitor {
 
-    private final ConnectionManager messenger;
     private final Rules rules;
     private final List<CLT_GameCommand> intermediates;
 
-    public ClientVisitor(ConnectionManager m, Rules rules) {
-        this.messenger = m;
+    public ClientVisitor(Rules rules) {
         this.rules = rules;
         this.intermediates = new ArrayList<>();
     }
@@ -42,18 +40,18 @@ public class ClientVisitor implements Visitor {
 
     @Override
     public void visit(SRV_AcceptConnect cmd) {
-        messenger.establishConnection(cmd.getSourceIP(), cmd.getSourcePort(), cmd.server_id);
-        State.INSTANCE.addServer(new Server(cmd.server_id, cmd.assigned_id));
+        ConnectionManager.establish(cmd.getSourceIP(), cmd.getSourcePort(), cmd.server_id);
+        State.INSTANCE.addServer(new Server(cmd.server_id, cmd.assigned_id, cmd.server_name));
     }
 
     @Override
     public void visit(CLT_RequestGameList cmd) {
-        //messenger.write(new B_Message(cmd));
+        
     }
 
     @Override
     public void visit(CLT_InitPlayer cmd) {
-        messenger.write(new B_Message(cmd));
+        ConnectionManager.write(new B_Message(cmd));
     }
 
     @Override

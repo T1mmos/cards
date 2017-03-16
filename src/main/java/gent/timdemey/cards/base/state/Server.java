@@ -11,15 +11,17 @@ public class Server {
 
     private final String srvId;
     private final String localId;
+    private final String name;
     private transient final List<Player> players;
     private transient final List<Game> games;
 
     private transient final List<ServerListener> listeners;
    
 
-    public Server(String srvId, String localId) {
+    public Server(String srvId, String localId, String name) {
         this.srvId = srvId;
         this.localId = localId;
+        this.name = name;
         this.players = new ArrayList<>();
         this.listeners = new ArrayList<>();
         this.games = new ArrayList<>();
@@ -27,6 +29,10 @@ public class Server {
 
     public String getServerId (){
         return srvId;
+    }
+    
+    public String getName (){
+        return name;
     }
     
     public void addPlayer(String id, String name) {

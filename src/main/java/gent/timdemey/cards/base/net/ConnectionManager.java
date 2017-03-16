@@ -2,6 +2,7 @@ package gent.timdemey.cards.base.net;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,29 +13,34 @@ import gent.timdemey.cards.base.beans.B_Message;
 
 public class ConnectionManager {
 
-    private final Map<String, Connection> established;
-    private final List<Connection> booting;
+    public static final String BROADCAST_ID = "BROADCAST";
+    private static final String BOOTING_ID = "BOOTING";
+    private static final Map<String, Connection> established = new HashMap<>();
+    private static final List<Connection> booting= new ArrayList<>();
 
-    public ConnectionManager() throws IOException {
-        this.established = new HashMap<>();
-        this.booting = new ArrayList<>();
+    private ConnectionManager(){
+        
     }
-
-    public Connection getConnection(String id) {
+    
+    public static Connection getConnection(String id) {
         return established.get(id);
     }
 
-    public Connection removeConnection(String id) {
+    public static Connection removeConnection(String id) {
         Connection c = established.remove(id);
         c.stop();
         return c;
     }
 
-    public void write(B_Message msg) {
-        if ("broadcast".equals(msg.getCommand().getDestinationID())) {
-            established.values().stream().forEach(conn -> conn.write(msg));
+    public static void write(B_Message msg) {
+        if (BROADCAST_ID.equals(msg.getCommand().getDestinationID())) {
+            established.values().stream().filter(conn -> !BOOTING_ID.equals(conn.getId())).forEach(conn -> conn.write(msg));
         } else {
-            established.get(msg.getCommand().getDestinationID()).write(msg);
+            Connection unicast_conn = established.get(msg.getCommand().getDestinationID());
+            if (BOOTING_ID.equals(unicast_conn.getId())){
+                throw new IllegalStateException("Cannot unicast to a booting connection!");
+            }
+            unicast_conn.write(msg);
         }
     }
 
@@ -50,19 +56,36 @@ public class ConnectionManager {
      * @param c
      * @throws IOException
      */
-    public void addBootingConnection(Connection c) throws IOException {
+    public static Connection newBootingConnection(Socket s) throws IOException {
+        Connection c = new Connection(s, BOOTING_ID);
         booting.add(c);
         c.addConnectionListener(conn -> booting.remove(conn));
+        c.startImpl();
+        return c;
+    }
+    
+    public static Connection newEstablishedConnection(Socket s, String id) throws IOException {
+        Connection c = newBootingConnection(s);
+        establish(s.getInetAddress(), s.getPort(), id);
+        return c;
+    }
+    
+    static void startConnection (Connection conn){
+        conn.startImpl();
+    }
+    
+    static void destroyConnection (Connection conn){
+        conn.stopImpl();
     }
 
     /**
      * Migrates a booting connection to the pool of established connections. The
      * connection can now be identified by the given ID (instead of the
-     * combination of given IP and port).
+     * combination of given IP and port) and one can start writing to the connection as well.
      * 
      * @param id
      */
-    public void establishConnection(InetAddress remote_ip, int remote_port, String assigned_id) {
+    public static  void establish(InetAddress remote_ip, int remote_port, String assigned_id) {
         Predicate<Connection> pred = c -> c.getInetAddress().equals(remote_ip) && c.getPort() == remote_port;
         Connection conn = booting.stream().filter(pred).findFirst().get();
         booting.remove(conn);
@@ -70,7 +93,7 @@ public class ConnectionManager {
         conn.setId(assigned_id);
     }
 
-    public boolean isEstablishedConnection(String id) {
+    public static boolean isEstablishedConnection(String id) {
         return established.containsKey(id);
     }
 }
