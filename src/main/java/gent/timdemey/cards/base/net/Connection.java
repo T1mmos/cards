@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.StringFormatterMessageFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
@@ -32,8 +36,10 @@ import gent.timdemey.cards.base.processing.SRV_RemovePlayer;
 
 public class Connection {
 
-    private static final Gson gson;
     public static final RuntimeTypeAdapterFactory<Command> GSON_COMMAND_ADAPTER;
+
+    private static final Logger logger = LogManager.getLogger("Connection", new StringFormatterMessageFactory());
+    private static final Gson gson;
 
     static {
         // all supported commands for serialization
@@ -74,26 +80,28 @@ public class Connection {
         this.msgListeners = ConcurrentHashMap.newKeySet();
         this.inetAddr = socket.getInetAddress();
         this.port = socket.getPort();
-        this.readThr = new Thread(() -> listen(), toString());
+        this.id = initial_id;
+        this.readThr = new Thread(() -> listen(), "Socket == " + inetAddr.getHostAddress() + ":" + port);
     }
 
     void setId(String id) {
         this.id = checkNotNull(id);
         this.readThr.setName(toString());
+        logger.info("Connection to %s:%s was given the id %s", inetAddr, port, id);
     }
 
     public void start() {
         ConnectionManager.startConnection(this);
     }
 
-    public void stop (){
+    public void stop() {
         ConnectionManager.destroyConnection(this);
     }
-    
-    void startImpl(){
+
+    void startImpl() {
         readThr.start();
     }
-    
+
     void stopImpl() {
         readThr.interrupt();
         try {
@@ -133,6 +141,7 @@ public class Connection {
     }
 
     void listen() {
+        logger.info("Started listening on connection to %s:%s", inetAddr, port);
         try {
             while (true) {
                 if (Thread.interrupted()) {
@@ -147,7 +156,6 @@ public class Connection {
                 msgListeners.stream().forEach(l -> l.onReceive(msg));
             }
         } catch (IOException e) {
-            e.printStackTrace();
             socket = null;
             readThr = null;
             try {
@@ -161,6 +169,7 @@ public class Connection {
                 System.out.println("Failed to close writer for connection to: " + id);
             }
         } finally {
+            logger.info("Stopped listening on connection to %s:%s (id=%s)", inetAddr, port, id);
             connListeners.forEach(c -> c.onConnectionLost(this));
         }
     }
