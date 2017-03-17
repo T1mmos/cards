@@ -1,101 +1,113 @@
 package gent.timdemey.cards.base;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.StringFormatterMessageFactory;
 
-import gent.timdemey.cards.base.net.Connection;
-import gent.timdemey.cards.base.net.ConnectionManager;
-import gent.timdemey.cards.base.processing.Processor;
-import gent.timdemey.cards.base.processing.SRV_AcceptConnect;
-import gent.timdemey.cards.base.processing.SRV_RemovePlayer;
-import gent.timdemey.cards.base.processing.ServerVisitor;
-import gent.timdemey.cards.base.processing.Visitor;
-import gent.timdemey.cards.base.state.Server;
-import gent.timdemey.cards.base.state.State;
-import gent.timdemey.cards.base.utils.StringUtils;
-import gent.timdemey.cards.solitaire.SolitaireRules;
-
 public class ServerRunner {
 
-    private static final Logger logger = LogManager.getLogger("ServerRunner", new StringFormatterMessageFactory());
-    
-    private Thread thread;
-    private volatile ServerSocket ssocket;
+    //
+    public static final Charset HANDSHAKE_CHARSET = Charset.forName("utf-8");
+    public static final byte[] BYTES_HANDSHAKE_INIT = "CARDS_HANDHAKE_INIT".getBytes(HANDSHAKE_CHARSET);
+    public static final byte[] BYTES_HANDSHAKE_ACK = "CARDS_HANDHAKE_ACK".getBytes(HANDSHAKE_CHARSET);
 
-    public ServerRunner() {
-        this.thread = new Thread(() -> listen(), "Server Socket");
+    private static final Logger logger = LogManager.getLogger("ServerRunner", new StringFormatterMessageFactory());
+
+    private final byte[] bytes_id;
+    private Thread thread;
+    private volatile DatagramSocket socket;
+
+    public ServerRunner(String id) {
+        this.bytes_id = id.getBytes(HANDSHAKE_CHARSET);
+
+        this.thread = new Thread(() -> listen_loop(), "UDP Server Discovery Socket Listener");
     }
 
     public void start(int port) throws IOException {
         if (thread == null) {
             throw new IllegalStateException("Has already run, create new instance instead");
         }
-        this.ssocket = new ServerSocket(port);
+        socket = new DatagramSocket(port, InetAddress.getByName("0.0.0.0"));
+
+        socket.setBroadcast(true);
         thread.start();
     }
 
     public void stop() {
-        try {
-            ssocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (thread == null) {
+            throw new IllegalStateException("Not started.");
         }
+
+        socket.close();
         try {
             thread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             thread = null;
-            ssocket = null;
+            socket = null;
         }
     }
 
-    private void listen() {
+    /**
+     * Parts taken from
+     */
+    private void listen_loop() {
         try {
-            Visitor v = new ServerVisitor(new SolitaireRules());
-            Processor.INSTANCE.addVisitor(v);
-
-            String id = "SRV-" + StringUtils.getRandomString(4);
-            final Server server = new Server(id, id, "My Awesome Card Server!");
-            State.INSTANCE.addServer(server);
-
             while (true) {
-                Socket csocket = ssocket.accept();
+                try {
+                    // Receive a packet
+                    byte[] recvBuf = new byte[100];
+                    DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
+                    socket.receive(packet);
 
-                // unique id
-                String unique_id = null;
-                do {
-                    unique_id = "CLT-" + StringUtils.getRandomString(4);
-                } while (server.isPlayer(unique_id));
+                    // See if the packet holds the right command (message)
+                    byte[] data = packet.getData();
+                    if (!Arrays.equals(data, BYTES_HANDSHAKE_INIT)) {
+                        continue;
+                    }
 
-                // set up connection
-                Connection conn = ConnectionManager.newEstablishedConnection(csocket, unique_id);
+                    ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                    DataOutputStream dos = new DataOutputStream(bs);
+                    dos.write(BYTES_HANDSHAKE_ACK);
+                    dos.write(bytes_id.length);
+                    dos.write(bytes_id);
+                    byte[] senddata = bs.toByteArray();
+                    
+                    bs.close();
+                    dos.close();
 
-                conn.addMessageListener(msg -> {
-                    Processor.INSTANCE.process(msg.getCommand());
-                });
-                conn.addConnectionListener(c -> {
-                    new SRV_RemovePlayer(c.getId()).setSourceID(server.getLocalId()).broadcast();
-                });
+                    // Send a response
+                    InetAddress to_ip = packet.getAddress();
+                    int to_port = packet.getPort();
+                    DatagramPacket sendPacket = new DatagramPacket(senddata, senddata.length, to_ip, to_port);
+                    socket.send(sendPacket);
 
-                // send acknowledgement which sets up the local ID at client
-                // side
-                new SRV_AcceptConnect(server.getLocalId(), unique_id, server.getName()).setSourceID(id)
-                        .unicast(unique_id);
+                    logger.info("Discovery packet received from: %s", packet.getAddress().getHostAddress());
+
+                } catch (SocketException ex) {
+                    if (!socket.isClosed()) {
+                        ex.printStackTrace();
+                    } else {
+                        throw ex;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (SocketException e) {
-            logger.info("Server stopped listening for connections");
+
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-        } finally {            
-            ConnectionManager.dropAllConnections();
         }
     }
 }

@@ -9,6 +9,8 @@ import gent.timdemey.cards.base.state.listeners.ServerListener;
 
 public class Server {
 
+    public static final int ID_LENGTH = 8;
+    
     private final String srvId;
     private final String localId;
     private final String name;
