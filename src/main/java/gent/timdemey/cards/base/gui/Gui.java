@@ -11,14 +11,22 @@ import javax.swing.WindowConstants;
 
 import com.alee.laf.WebLookAndFeel;
 
-import gent.timdemey.cards.base.gui.action.JoinServerAction;
+import gent.timdemey.cards.base.gui.action.ShowServersAction;
 import gent.timdemey.cards.base.gui.action.QuitAction;
 import gent.timdemey.cards.base.gui.action.StartServerAction;
 import gent.timdemey.cards.base.gui.action.StopServerAction;
+import gent.timdemey.cards.base.processing.ClientVisitor;
+import gent.timdemey.cards.base.processing.Processor;
+import gent.timdemey.cards.base.processing.Visitor;
+import gent.timdemey.cards.solitaire.SolitaireRules;
 
 public class Gui {
     public static void main(String[] args) {
         WebLookAndFeel.install();
+
+        Visitor v = new ClientVisitor(new SolitaireRules());
+        Processor.INSTANCE.addVisitor(v);
+        
         SwingUtilities.invokeLater(() -> runUI());
     }
 
@@ -26,7 +34,8 @@ public class Gui {
         JFrame frame = new JFrame();
         frame.setJMenuBar(buildMenuBar());
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setMinimumSize(new Dimension(300, 200));
+        frame.setMinimumSize(new Dimension(600, 400));
+        frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);
     }
@@ -38,7 +47,7 @@ public class Gui {
         {
             JMenu file = new JMenu("Game");
             { // Join
-                JMenuItem join = new JMenuItem(new JoinServerAction());
+                JMenuItem join = new JMenuItem(new ShowServersAction());
                 file.add(join);
             }
             file.addSeparator();            

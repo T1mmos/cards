@@ -41,6 +41,7 @@ public class Server {
         Player player = new Player(id, name);
         players.add(player);
         listeners.forEach(l -> l.onPlayerAdded(player));
+        System.err.println("PLAYER ADDED " + name + "," + id);
     }
 
     public void removePlayer(String id) {

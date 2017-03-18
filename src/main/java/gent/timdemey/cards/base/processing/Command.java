@@ -2,6 +2,7 @@ package gent.timdemey.cards.base.processing;
 
 import java.net.InetAddress;
 
+import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.beans.BeanUtils;
 import gent.timdemey.cards.base.net.ConnectionManager;
 
@@ -61,8 +62,16 @@ public abstract class Command {
     public void unicast(String destination_id){
         setDestinationID(destination_id).send();
     }
+    
+    public void selfcast(){
+        setDestinationID(ConnectionManager.INTERNAL_ID).send();
+    }
 
     private void send (){
+        ConnectionManager.write(new B_Message(this));
+    }
+    
+    public void process (){
         Processor.INSTANCE.process(this);
     }
     

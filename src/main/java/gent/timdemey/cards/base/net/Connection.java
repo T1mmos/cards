@@ -1,7 +1,5 @@
 package gent.timdemey.cards.base.net;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,7 +22,7 @@ import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 
 import gent.timdemey.cards.base.beans.B_Message;
 import gent.timdemey.cards.base.processing.CLT_AbortPickUp;
-import gent.timdemey.cards.base.processing.CLT_InitPlayer;
+import gent.timdemey.cards.base.processing.CLT_JoinServer;
 import gent.timdemey.cards.base.processing.CLT_PickUp;
 import gent.timdemey.cards.base.processing.CLT_PutDown;
 import gent.timdemey.cards.base.processing.CLT_RequestGameList;
@@ -39,23 +37,23 @@ public class Connection {
     public static final RuntimeTypeAdapterFactory<Command> GSON_COMMAND_ADAPTER;
 
     private static final Logger logger = LogManager.getLogger("Connection", new StringFormatterMessageFactory());
-    private static final Gson gson;
+    public static final Gson gson;
 
     static {
         // all supported commands for serialization
-        //@formatter:off
+        // @formatter:off
         List<Class<? extends Command>> commands = Arrays.asList(
-            CLT_PickUp.class ,
-            CLT_PutDown.class,
-            CLT_AbortPickUp.class,
-            CLT_TransferCommand.class,
-            SRV_AcceptConnect.class,
-            CLT_RequestGameList.class,
-            CLT_InitPlayer.class,
-            SRV_AddPlayer.class,
-            SRV_RemovePlayer.class
-        );
-        //@formatter:on      
+                CLT_PickUp.class, 
+                CLT_PutDown.class,
+                CLT_AbortPickUp.class, 
+                CLT_TransferCommand.class, 
+                SRV_AcceptConnect.class,
+                CLT_JoinServer.class,
+                CLT_RequestGameList.class,
+                SRV_AddPlayer.class, 
+                SRV_RemovePlayer.class
+                );
+        // @formatter:on
         GSON_COMMAND_ADAPTER = RuntimeTypeAdapterFactory.of(Command.class);
         commands.stream().forEach(GSON_COMMAND_ADAPTER::registerSubtype);
         gson = new GsonBuilder().registerTypeAdapterFactory(GSON_COMMAND_ADAPTER).create();
@@ -70,9 +68,8 @@ public class Connection {
     private BufferedReader reader;
     private Thread readThr = null;
     private Socket socket;
-    private String id;
 
-    Connection(Socket socket, String initial_id) throws IOException {
+    Connection(Socket socket) throws IOException {
         this.socket = socket;
         this.writer = new PrintWriter(socket.getOutputStream());
         this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -80,29 +77,15 @@ public class Connection {
         this.msgListeners = ConcurrentHashMap.newKeySet();
         this.inetAddr = socket.getInetAddress();
         this.port = socket.getPort();
-        this.id = initial_id;
-        this.readThr = new Thread(() -> listen(), "Socket == " + inetAddr.getHostAddress() + ":" + port);
+        this.readThr = new Thread(() -> listen());
     }
 
-    void setId(String id) {
-        this.id = checkNotNull(id);
-        this.readThr.setName(toString());
-        logger.info("Connection to %s:%s was given the id %s", inetAddr, port, id);
-    }
-
-    public void start() {
-        ConnectionManager.startConnection(this);
-    }
-
-    public void stop() {
-        ConnectionManager.destroyConnection(this);
-    }
-
-    void startImpl() {
+    void start(String name) {
+        readThr.setName(name);
         readThr.start();
     }
 
-    void stopImpl() {
+    void stop() {
         readThr.interrupt();
         try {
             socket.close();
@@ -117,7 +100,7 @@ public class Connection {
         connListeners.clear();
     }
 
-    void write(B_Message msg) {
+    public void write(B_Message msg) {
         String line = gson.toJson(msg);
         String crlfline = line.endsWith("\n") ? line : (line + "\n");
         try {
@@ -161,15 +144,15 @@ public class Connection {
             try {
                 reader.close();
             } catch (IOException e2) {
-                System.out.println("Failed to close reader for connection to: " + id);
+                System.out.println("Failed to close reader for " + toString());
             }
             try {
                 writer.close();
             } catch (IOException e2) {
-                System.out.println("Failed to close writer for connection to: " + id);
+                System.out.println("Failed to close writer for connection to: " + toString());
             }
         } finally {
-            logger.info("Stopped listening on connection to %s:%s (id=%s)", inetAddr, port, id);
+            logger.info("Stopped listening on connection to %s:%s", inetAddr, port);
             connListeners.forEach(c -> c.onConnectionLost(this));
         }
     }
@@ -182,12 +165,8 @@ public class Connection {
         return port;
     }
 
-    public String getId() {
-        return id;
-    }
-
     @Override
     public String toString() {
-        return "Connection @ " + getId();
+        return getInetAddress().getHostAddress() + ":" + getPort();
     }
 }

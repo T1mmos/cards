@@ -12,10 +12,10 @@ public interface Visitor {
     public void visit(SRV_AcceptConnect cmd);
 
     public void visit(CLT_RequestGameList cmd);
-    
-    public void visit(CLT_InitPlayer cmd);
 
     public void visit (SRV_AddPlayer cmd);
     
     public void visit(SRV_RemovePlayer cmd);
+    
+    public void visit(CLT_JoinServer cmd);
 }

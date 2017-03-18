@@ -2,14 +2,11 @@ package gent.timdemey.cards.solitaire;
 
 import gent.timdemey.cards.base.beans.B_Card;
 import gent.timdemey.cards.base.beans.B_Kind;
-import gent.timdemey.cards.base.beans.PickUpDef;
 import gent.timdemey.cards.base.beans.B_Pile;
-import gent.timdemey.cards.base.beans.PutDownDef;
-import gent.timdemey.cards.base.beans.TransferDef;
 import gent.timdemey.cards.base.logic.Rules;
-import gent.timdemey.cards.base.processing.CLT_TransferCommand;
 import gent.timdemey.cards.base.processing.CLT_PickUp;
 import gent.timdemey.cards.base.processing.CLT_PutDown;
+import gent.timdemey.cards.base.processing.CLT_TransferCommand;
 import gent.timdemey.cards.base.state.Game;
 
 public class SolitaireRules implements Rules {
